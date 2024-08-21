@@ -1,0 +1,11 @@
+.envrc
+.build/
+DerivedData/
+*.swiftpm/
+Packages/
+.DS_Store
+*.tmp
+*.swp
+.vscode/
+.idea/
+prefs.plist
