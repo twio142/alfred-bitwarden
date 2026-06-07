@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 
 enum URLMatcher {
@@ -54,8 +55,8 @@ enum URLMatcher {
         return false
     }
 
-    /// Browsers supported: Safari, Firefox, Chrome, Edge, Opera, Brave, Vivaldi, Ghost, Arc
-    static func browserURL() -> String? {
+    /// Browsers supported: Safari, Firefox, Chrome, Edge, Opera, Brave, Vivaldi, Arc
+    static func browserInfo() -> (url: String, bundleId: String)? {
         let browsers: [(app: String, script: String)] = [
             ("Safari", "tell application \"Safari\" to return URL of current tab of front window"),
             ("Firefox", "tell application \"Firefox\" to return URL of active tab of front window"),
@@ -67,22 +68,22 @@ enum URLMatcher {
             ("Arc", "tell application \"Arc\" to return URL of active tab of front window"),
         ]
 
-        let frontApp = frontmostAppName()
+        guard let app = NSWorkspace.shared.menuBarOwningApplication,
+              let frontApp = app.localizedName,
+              let bundleId = app.bundleIdentifier
+        else { return nil }
 
-        for (app, script) in browsers {
-            guard frontApp?.lowercased().contains(app.lowercased().components(separatedBy: " ").first ?? app) == true
-                    || frontApp == app
+        for (name, script) in browsers {
+            guard frontApp.lowercased().contains(name.lowercased().components(separatedBy: " ").first ?? name) == true
+                    || frontApp == name
             else { continue }
-            if let url = runAppleScript(script) {
-                return url
-            }
+            if let url = runAppleScript(script) { return (url, bundleId) }
         }
         return nil
     }
 
-    private static func frontmostAppName() -> String? {
-        let script = "tell application \"System Events\" to return name of first application process whose frontmost is true"
-        return runAppleScript(script)
+    static func browserURL() -> String? {
+        browserInfo()?.url
     }
 
     private static func runAppleScript(_ script: String) -> String? {
