@@ -3,7 +3,9 @@ import Foundation
 enum ListAttachments {
     static func run() {
         let args = Array(CommandLine.arguments.dropFirst(2))
-        guard let itemId = args.first else {
+        let env = ProcessInfo.processInfo.environment
+        let itemId = args.first ?? env["item_id"] ?? ""
+        guard !itemId.isEmpty else {
             AlfredOutput.error("Usage: list_attachments <item_id>").printJSON()
             return
         }
@@ -40,7 +42,6 @@ enum ListAttachments {
                     title: att.fileName ?? att.id,
                     subtitle: att.sizeName ?? att.size ?? "Unknown size",
                     arg: .multiple([itemId, att.id]),
-                    icon: AlfredIcon(path: "icons/attachment.png"),
                     variables: ["action": "get_attachment"]
                 )
             }

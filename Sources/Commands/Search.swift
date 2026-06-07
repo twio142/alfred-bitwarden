@@ -14,27 +14,7 @@ enum Search {
         let prefs = WorkflowPrefs.load()
         let recency = RecencyStore.load()
 
-        var items = cache.items
-
-        // Apply org filter
-        if let orgId = prefs.defaultOrganizationId {
-            items = items.filter { $0.organizationId == orgId }
-        }
-        // Apply collection filter
-        if let colId = prefs.defaultCollectionId {
-            items = items.filter { $0.collectionIds.contains(colId) }
-        }
-
-        // Apply text query filter
-        if !query.isEmpty {
-            let q = query.lowercased()
-            items = items.filter { item in
-                item.name.lowercased().contains(q) ||
-                    item.login?.username?.lowercased().contains(q) == true ||
-                    item.login?.uris?.first?.uri?.lowercased().contains(q) == true ||
-                    item.notes?.lowercased().contains(q) == true
-            }
-        }
+        var items = applyFilters(to: cache.items, prefs: prefs, env: env, query: query)
 
         // Browser URL matching
         let browserDomain = URLMatcher.browserURL().flatMap { URLMatcher.etld1(from: $0) }
@@ -45,8 +25,8 @@ enum Search {
             let bUrlMatch = browserDomain != nil && matchesDomain(item: b, domain: browserDomain!)
             if aUrlMatch != bUrlMatch { return aUrlMatch }
 
-            let aRecent = a.id == recency.lastItemId
-            let bRecent = b.id == recency.lastItemId
+            let aRecent = recency.isRecent(for: a.id)
+            let bRecent = recency.isRecent(for: b.id)
             if aRecent != bRecent { return aRecent }
 
             if a.favorite != b.favorite { return a.favorite }
@@ -71,6 +51,30 @@ enum Search {
         }
     }
 
+    private static func applyFilters(to items: [CachedItem], prefs: WorkflowPrefs, env: [String: String], query: String) -> [CachedItem] {
+        var items = items
+        if let orgId = prefs.defaultOrganizationId { items = items.filter { $0.organizationId == orgId } }
+        if let colId = prefs.defaultCollectionId { items = items.filter { $0.collectionIds.contains(colId) } }
+        if let folderId = env["folder_id"] {
+            if folderId.isEmpty {
+                items = items.filter { $0.folderId == nil }
+            } else {
+                items = items.filter { $0.folderId == folderId }
+            }
+        }
+        if env["favorites"] == "true" { items = items.filter { $0.favorite } }
+        if !query.isEmpty {
+            let q = query.lowercased()
+            items = items.filter {
+                $0.name.lowercased().contains(q) ||
+                    $0.login?.username?.lowercased().contains(q) == true ||
+                    $0.login?.uris?.first?.uri?.lowercased().contains(q) == true ||
+                    $0.notes?.lowercased().contains(q) == true
+            }
+        }
+        return items
+    }
+
     private static func matchesDomain(item: CachedItem, domain: String) -> Bool {
         guard let uris = item.login?.uris else { return false }
         return uris.contains { uri in
@@ -81,7 +85,7 @@ enum Search {
 
     static func makeAlfredItem(item: CachedItem, recency: RecencyStore) -> AlfredItem {
         let subtitle = buildSubtitle(item: item)
-        let isRecent = item.id == recency.lastItemId
+        let isRecent = recency.isRecent(for: item.id)
         let icon = isRecent ? "icons/clock.png" : iconPath(for: item)
         let quicklookurl = item.login?.uris?.first?.uri
 

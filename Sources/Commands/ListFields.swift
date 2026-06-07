@@ -3,7 +3,9 @@ import Foundation
 enum ListFields {
     static func run() {
         let args = Array(CommandLine.arguments.dropFirst(2))
-        guard let itemId = args.first else {
+        let env = ProcessInfo.processInfo.environment
+        let itemId = args.first ?? env["item_id"] ?? ""
+        guard !itemId.isEmpty else {
             AlfredOutput.error("Usage: list_fields <item_id>").printJSON()
             return
         }

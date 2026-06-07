@@ -31,7 +31,6 @@ enum DeleteItem {
             AlfredOutput.single(AlfredItem(
                 title: "Item deleted",
                 subtitle: "\(itemName) moved to Trash",
-                icon: AlfredIcon(path: "icons/delete.png"),
                 valid: false
             )).printJSON()
         } catch {

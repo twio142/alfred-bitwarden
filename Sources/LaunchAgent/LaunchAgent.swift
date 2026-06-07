@@ -1,7 +1,10 @@
 import Foundation
 
 enum LaunchAgent {
-    static let label = "com.alfred.bw-alfred.sync"
+    static var label: String {
+        ProcessInfo.processInfo.environment["alfred_workflow_bundleid"] ?? "com.alfred.bw-alfred.sync"
+    }
+
     static var plistPath: String {
         let home = ProcessInfo.processInfo.environment["HOME"] ?? NSHomeDirectory()
         return "\(home)/Library/LaunchAgents/\(label).plist"
@@ -10,13 +13,11 @@ enum LaunchAgent {
     static func install() throws {
         let env = ProcessInfo.processInfo.environment
         let syncIntervalMinutes = Int(env["SyncTime"] ?? "60") ?? 60
-        let syncIntervalSeconds = syncIntervalMinutes * 60
+        let startInterval = syncIntervalMinutes * 60
 
-        guard let binaryPath = Bundle.main.executableURL?.path
-                ?? ProcessInfo.processInfo.arguments.first
-        else {
+        guard let bundleId = env["alfred_workflow_bundleid"] else {
             throw NSError(domain: "bw-alfred", code: 1,
-                          userInfo: [NSLocalizedDescriptionKey: "Cannot determine binary path"])
+                          userInfo: [NSLocalizedDescriptionKey: "alfred_workflow_bundleid not set"])
         }
 
         let plist = """
@@ -25,16 +26,19 @@ enum LaunchAgent {
         <plist version="1.0">
         <dict>
             <key>Label</key>
-            <string>\(label)</string>
+            <string>\(bundleId)</string>
+            <key>LimitLoadToSessionType</key>
+            <array>
+                <string>Aqua</string>
+            </array>
             <key>ProgramArguments</key>
             <array>
-                <string>\(binaryPath)</string>
-                <string>sync_vault</string>
+                <string>/usr/bin/osascript</string>
+                <string>-e</string>
+                <string>tell application id "com.runningwithcrayons.Alfred" to run trigger "sync_vault" in workflow "\(bundleId)"</string>
             </array>
             <key>StartInterval</key>
-            <integer>\(syncIntervalSeconds)</integer>
-            <key>RunAtLoad</key>
-            <false/>
+            <integer>\(startInterval)</integer>
         </dict>
         </plist>
         """

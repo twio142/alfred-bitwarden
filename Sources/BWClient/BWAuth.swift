@@ -41,7 +41,7 @@ enum BWAuth {
     }
 
     static func logout() {
-        _ = try? runProcess("bw", args: ["logout"]).0
+        runProcess("bw", args: ["logout"])
     }
 
     static func unlock(password: String) throws -> String {

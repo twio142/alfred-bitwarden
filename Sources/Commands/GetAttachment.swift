@@ -40,7 +40,6 @@ enum GetAttachment {
             AlfredOutput.single(AlfredItem(
                 title: "Downloaded \(fileName)",
                 subtitle: destURL.path,
-                icon: AlfredIcon(path: "icons/attachment.png"),
                 valid: false
             )).printJSON()
         } catch {

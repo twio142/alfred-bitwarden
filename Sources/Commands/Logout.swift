@@ -9,7 +9,6 @@ enum Logout {
         AlfredOutput.single(AlfredItem(
             title: "Logged out",
             subtitle: "Successfully logged out of Bitwarden",
-            icon: AlfredIcon(path: "icons/logout.png"),
             valid: false
         )).printJSON()
     }

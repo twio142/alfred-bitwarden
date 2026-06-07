@@ -23,7 +23,6 @@ enum SetFavorite {
             AlfredOutput.single(AlfredItem(
                 title: label,
                 subtitle: item.name,
-                icon: AlfredIcon(path: "icons/favorite.png"),
                 valid: false
             )).printJSON()
         } catch {

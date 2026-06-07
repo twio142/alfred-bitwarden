@@ -10,7 +10,6 @@ enum ManageAgent {
                     ? "Remove the background sync agent"
                     : "Install background sync agent",
                 arg: .single(installed ? "uninstall_agent" : "install_agent"),
-                icon: AlfredIcon(path: "icons/sync.png"),
                 variables: ["next": installed ? "uninstall_agent" : "install_agent"]
             ),
         ]
@@ -23,7 +22,6 @@ enum ManageAgent {
             AlfredOutput.single(AlfredItem(
                 title: "Auto sync installed",
                 subtitle: "Background sync agent is now active",
-                icon: AlfredIcon(path: "icons/sync.png"),
                 valid: false
             )).printJSON()
         } catch {

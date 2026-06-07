@@ -7,7 +7,6 @@ enum LockVault {
             AlfredOutput.single(AlfredItem(
                 title: "Vault locked",
                 subtitle: "Vault has been locked",
-                icon: AlfredIcon(path: "icons/lock.png"),
                 valid: false
             )).printJSON()
         } catch {

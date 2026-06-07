@@ -22,7 +22,6 @@ enum Unlock {
             AlfredOutput.single(AlfredItem(
                 title: "Vault unlocked",
                 subtitle: "Vault is now unlocked",
-                icon: AlfredIcon(path: "icons/unlock.png"),
                 valid: false
             )).printJSON()
         } catch {

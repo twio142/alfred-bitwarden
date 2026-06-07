@@ -7,6 +7,16 @@ struct ServerState {
 }
 
 enum BWStatus {
+    static func getOrStart() throws -> ServerState {
+        if let state = try? get() { return state }
+        BWServer.start()
+        for _ in 0 ..< 20 {
+            Thread.sleep(forTimeInterval: 0.1)
+            if let state = try? get() { return state }
+        }
+        return try get()
+    }
+
     static func get() throws -> ServerState {
         let data = try BWClient.shared.get("/status")
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],

@@ -12,7 +12,6 @@ enum SetCollection {
             AlfredOutput.single(AlfredItem(
                 title: id == "all" ? "Showing all collections" : "Collection filter set",
                 subtitle: id == "all" ? "No collection filter applied" : "Filtered to collection",
-                icon: AlfredIcon(path: "icons/collection.png"),
                 valid: false
             )).printJSON()
             return
@@ -34,7 +33,6 @@ enum SetCollection {
                 title: "All Collections",
                 subtitle: "Show items from all collections",
                 arg: .single("all"),
-                icon: AlfredIcon(path: "icons/collection.png"),
                 variables: ["next": "set_collection", "collection_id": "all"]
             ),
         ]
@@ -43,7 +41,6 @@ enum SetCollection {
                 title: col.name,
                 subtitle: "Filter to this collection",
                 arg: .single(col.id),
-                icon: AlfredIcon(path: "icons/collection.png"),
                 variables: ["next": "set_collection", "collection_id": col.id]
             )
         }

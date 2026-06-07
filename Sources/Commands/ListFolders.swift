@@ -14,15 +14,19 @@ enum ListFolders {
             return
         }
 
-        let items = cache.folders.map { folder in
+        let favoritesItem = AlfredItem(
+            title: "Favorites",
+            subtitle: "Show favorite items",
+            variables: ["next": "search", "favorites": "true"]
+        )
+        let folderItems = cache.folders.map { folder in
             AlfredItem(
                 title: folder.name,
                 subtitle: "Search in \(folder.name)",
-                arg: .single(folder.id),
                 icon: AlfredIcon(path: "icons/folder.png"),
                 variables: ["next": "search", "folder_id": folder.id]
             )
         }
-        AlfredOutput(items: items).printJSON()
+        AlfredOutput(items: [favoritesItem] + folderItems).printJSON()
     }
 }

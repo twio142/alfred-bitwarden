@@ -6,7 +6,6 @@ extension AlfredOutput {
             AlfredItem(
                 title: "Error",
                 subtitle: message,
-                icon: AlfredIcon(path: "icons/error.png"),
                 valid: false
             ),
         ])
@@ -17,7 +16,6 @@ extension AlfredOutput {
             items: [
                 AlfredItem(
                     title: message,
-                    icon: AlfredIcon(path: "icons/sync.png"),
                     valid: false
                 ),
             ],

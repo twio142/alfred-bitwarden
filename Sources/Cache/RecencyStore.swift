@@ -27,6 +27,11 @@ struct RecencyStore: Codable {
         }
     }
 
+    func isRecent(for itemId: String, maxAge: TimeInterval = 300) -> Bool {
+        guard lastItemId == itemId, let lastCopiedAt else { return false }
+        return Date().timeIntervalSince(lastCopiedAt) < maxAge
+    }
+
     func shouldRotateToTOTP(for itemId: String) -> Bool {
         guard lastItemId == itemId,
               lastField == "password",

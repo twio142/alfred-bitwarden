@@ -12,7 +12,6 @@ enum SyncVault {
             AlfredOutput.single(AlfredItem(
                 title: "Vault synced",
                 subtitle: "\(cache.items.count) items synced at \(timestamp)",
-                icon: AlfredIcon(path: "icons/sync.png"),
                 valid: false
             )).printJSON()
         } catch {

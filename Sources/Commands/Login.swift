@@ -7,7 +7,6 @@ enum Login {
             AlfredOutput.single(AlfredItem(
                 title: "Logged in successfully",
                 subtitle: "Vault is unlocked",
-                icon: AlfredIcon(path: "icons/unlock.png"),
                 valid: false
             )).printJSON()
         } catch {
