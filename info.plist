@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>org.mlfs.corp.bw</string>
+	<string>com.twio142.bitwarden</string>
 	<key>category</key>
 	<string>Security</string>
 	<key>connections</key>
@@ -86,13 +86,13 @@
 		</array>
 	</dict>
 	<key>createdby</key>
-	<string>Andy Rosen</string>
+	<string>twio142</string>
 	<key>description</key>
 	<string>Interact with Bitwarden CLI</string>
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
-	<string>Bitwarden Accelerator</string>
+	<string>Bitwarden</string>
 	<key>objects</key>
 	<array>
 		<dict>
@@ -364,54 +364,11 @@
 		</dict>
 	</array>
 	<key>readme</key>
-	<string># Bitwarden Accelerator
+	<string># Alfred Bitwarden
 
-Interact with [Bitwarden CLI](https://bitwarden.com/help/cli/)
+Interact with [Bitwarden CLI](https://bitwarden.com/help/cli/).
 
-Full documentation on [GitHub](https://github.com/ajrosen/Bitwarden-Accelerator/blob/main/README.md)
-
-## Modifiers
-
-* Control - Copy username
-* Shift - Copy TOTP code
-* Command - Copy notes
-* Option - Opens a new menu with additional actions
-* Fn - Show all fields in a dialog window
-* Command + Option - Show all fields in Alfred
-
-## Key Features
-
-#### Logging in
-
-* Login with username and password, or API Key
-* Two-step logins with Authenticator app, YubiKey OTP, or Email
-
-#### Selecting items
-
-* Recently selected item is listed first
-* Automatically searches for the active browser tab's domain name
-* Favorite items are indicated with a ❤️
-* Search different fields of an item
-	* Any item by its name or folder
-	* Logins by username or URL
-	* Cards by brand (eg., search for "Visa")
-	* Identities by any field in the item
-
-#### Selecting fields
-
-* Copy username, password, TOTP code, or notes to the clipboard
-* Copy TOTP code instead of password if called shortly after copying an item's password
-
-#### Miscellaneous
-
-* Download an item's attachments
-* Limit searches to a single vault and/or collection to prevent shoulder-surfing
-* View any item in a separate window to copy/paste multiple fields easily
-* View any item's fields within Alfred when using a [Universal Action](https://www.alfredapp.com/universal-actions/)
-* (Optional) Automatically sync vault in the background using a MacOS Launch Agent
-
----
-*Version 4.2.0*</string>
+Full documentation on [GitHub](https://github.com/twio142/alfred-bitwarden/).</string>
 	<key>uidata</key>
 	<dict>
 		<key>04923DF0-BC75-422A-B213-36508EB500F3</key>
@@ -493,25 +450,6 @@ Full documentation on [GitHub](https://github.com/ajrosen/Bitwarden-Accelerator/
 			<string>textfield</string>
 			<key>variable</key>
 			<string>bwuser</string>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>default</key>
-				<false/>
-				<key>required</key>
-				<false/>
-				<key>text</key>
-				<string>Install auto-sync service</string>
-			</dict>
-			<key>description</key>
-			<string>Installs a launch agent to sync your vault every "Sync Interval" minutes (recommended)</string>
-			<key>label</key>
-			<string>Auto Sync</string>
-			<key>type</key>
-			<string>checkbox</string>
-			<key>variable</key>
-			<string>autoSync</string>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -720,8 +658,8 @@ Full documentation on [GitHub](https://github.com/ajrosen/Bitwarden-Accelerator/
 		</dict>
 	</array>
 	<key>version</key>
-	<string>4.2.0</string>
+	<string>5.0.0</string>
 	<key>webaddress</key>
-	<string>https://github.com/ajrosen/Bitwarden-Accelerator</string>
+	<string>https://github.com/twio142/alfred-bitwarden</string>
 </dict>
 </plist>
