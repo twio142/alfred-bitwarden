@@ -105,7 +105,6 @@ enum Search {
         }()
 
         return AlfredItem(
-            uid: item.id,
             title: item.name,
             subtitle: subtitle,
             arg: defaultArg,
