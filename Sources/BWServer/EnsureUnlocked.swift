@@ -40,7 +40,7 @@ private func waitForServer(timeout: TimeInterval) throws {
 
 private func handleLogin() throws {
     let env = ProcessInfo.processInfo.environment
-    let email = env["bw_email"] ?? ""
+    let email = env["bwuser"] ?? ""
 
     var password: String?
     if let stored = try? Keychain.load(for: email), !stored.isEmpty {
@@ -57,7 +57,7 @@ private func handleLogin() throws {
 
 private func handleUnlock() throws {
     let env = ProcessInfo.processInfo.environment
-    let email = env["bw_email"] ?? ""
+    let email = env["bwuser"] ?? ""
 
     if let stored = try? Keychain.load(for: email), !stored.isEmpty {
         if let _ = try? BWAuth.restUnlock(password: stored) {

@@ -1,6 +1,6 @@
-import Testing
-import Foundation
 @testable import bw_alfred
+import Foundation
+import Testing
 
 struct AlfredOutputTests {
     func encodeJSON(_ output: AlfredOutput) throws -> [String: Any] {

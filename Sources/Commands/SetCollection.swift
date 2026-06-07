@@ -1,6 +1,6 @@
 import Foundation
 
-struct SetCollection {
+enum SetCollection {
     static func run() {
         let args = Array(CommandLine.arguments.dropFirst(2))
         let collectionId = args.first
@@ -33,18 +33,18 @@ struct SetCollection {
             AlfredItem(
                 title: "All Collections",
                 subtitle: "Show items from all collections",
-                arg: "all",
+                arg: .single("all"),
                 icon: AlfredIcon(path: "icons/collection.png"),
-                variables: ["next_command": "set_collection", "collection_id": "all"]
-            )
+                variables: ["next": "set_collection", "collection_id": "all"]
+            ),
         ]
         items += collections.map { col in
             AlfredItem(
                 title: col.name,
                 subtitle: "Filter to this collection",
-                arg: col.id,
+                arg: .single(col.id),
                 icon: AlfredIcon(path: "icons/collection.png"),
-                variables: ["next_command": "set_collection", "collection_id": col.id]
+                variables: ["next": "set_collection", "collection_id": col.id]
             )
         }
         AlfredOutput(items: items).printJSON()

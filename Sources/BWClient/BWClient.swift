@@ -12,14 +12,13 @@ final class BWClient: @unchecked Sendable {
 
     private let baseURL: String
     private let session: URLSession
-    var sessionToken: String?
 
     init(baseURL: String = "http://localhost:8087") {
         self.baseURL = baseURL
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 5
         config.timeoutIntervalForResource = 5
-        self.session = URLSession(configuration: config)
+        session = URLSession(configuration: config)
     }
 
     func get(_ path: String) throws -> Data {
@@ -48,9 +47,6 @@ final class BWClient: @unchecked Sendable {
         }
         var req = URLRequest(url: url)
         req.httpMethod = method
-        if let token = sessionToken {
-            req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        }
         if let body = body {
             req.httpBody = body
             req.setValue("application/json", forHTTPHeaderField: "Content-Type")

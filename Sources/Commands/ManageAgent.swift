@@ -1,6 +1,6 @@
 import Foundation
 
-struct ManageAgent {
+enum ManageAgent {
     static func run() {
         let installed = LaunchAgent.isInstalled
         let items: [AlfredItem] = [
@@ -9,10 +9,10 @@ struct ManageAgent {
                 subtitle: installed
                     ? "Remove the background sync agent"
                     : "Install background sync agent",
-                arg: installed ? "uninstall_agent" : "install_agent",
+                arg: .single(installed ? "uninstall_agent" : "install_agent"),
                 icon: AlfredIcon(path: "icons/sync.png"),
-                variables: ["next_command": installed ? "uninstall_agent" : "install_agent"]
-            )
+                variables: ["next": installed ? "uninstall_agent" : "install_agent"]
+            ),
         ]
         AlfredOutput(items: items).printJSON()
     }

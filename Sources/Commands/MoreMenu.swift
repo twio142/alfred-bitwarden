@@ -1,6 +1,6 @@
 import Foundation
 
-struct MoreMenu {
+enum MoreMenu {
     static func run() {
         let args = Array(CommandLine.arguments.dropFirst(2))
         guard let itemId = args.first else {
@@ -20,39 +20,35 @@ struct MoreMenu {
             AlfredItem(
                 title: isFavorite ? "Remove from Favorites" : "Mark as Favorite",
                 subtitle: isFavorite ? "Remove this item from favorites" : "Add this item to favorites",
-                arg: itemId,
+                arg: .multiple([itemId, isFavorite ? "false" : "true"]),
                 icon: AlfredIcon(path: "icons/favorite.png"),
-                variables: [
-                    "next_command": "set_favorite",
-                    "item_id": itemId,
-                    "favorite": isFavorite ? "false" : "true"
-                ]
+                variables: ["action": "set_favorite"]
             ),
             AlfredItem(
                 title: "Move to Folder",
                 subtitle: "Change the folder for this item",
-                arg: itemId,
+                arg: nil,
                 icon: AlfredIcon(path: "icons/folder.png"),
-                variables: ["next_command": "set_folder", "item_id": itemId]
-            )
+                variables: ["next": "set_folder", "item_id": itemId]
+            ),
         ]
 
         if item.hasAttachments {
             alfredItems.append(AlfredItem(
                 title: "Download Attachment",
                 subtitle: "Download an attachment",
-                arg: itemId,
+                arg: nil,
                 icon: AlfredIcon(path: "icons/attachment.png"),
-                variables: ["next_command": "list_attachments", "item_id": itemId]
+                variables: ["next": "list_attachments", "item_id": itemId]
             ))
         }
 
         alfredItems.append(AlfredItem(
             title: "Delete Item",
             subtitle: "Move this item to Trash",
-            arg: itemId,
+            arg: .single(itemId),
             icon: AlfredIcon(path: "icons/delete.png"),
-            variables: ["next_command": "rm", "item_id": itemId]
+            variables: ["action": "delete_item"]
         ))
 
         AlfredOutput(items: alfredItems).printJSON()

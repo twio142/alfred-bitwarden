@@ -1,6 +1,6 @@
 import Foundation
 
-struct ListAttachments {
+enum ListAttachments {
     static func run() {
         let args = Array(CommandLine.arguments.dropFirst(2))
         guard let itemId = args.first else {
@@ -17,7 +17,7 @@ struct ListAttachments {
 
         guard item.hasAttachments else {
             AlfredOutput(items: [
-                AlfredItem(title: "No attachments", subtitle: "This item has no attachments", valid: false)
+                AlfredItem(title: "No attachments", subtitle: "This item has no attachments", valid: false),
             ]).printJSON()
             return
         }
@@ -30,7 +30,7 @@ struct ListAttachments {
 
             if attachments.isEmpty {
                 AlfredOutput(items: [
-                    AlfredItem(title: "No attachments found", valid: false)
+                    AlfredItem(title: "No attachments found", valid: false),
                 ]).printJSON()
                 return
             }
@@ -39,9 +39,9 @@ struct ListAttachments {
                 AlfredItem(
                     title: att.fileName ?? att.id,
                     subtitle: att.sizeName ?? att.size ?? "Unknown size",
-                    arg: att.id,
+                    arg: .multiple([itemId, att.id]),
                     icon: AlfredIcon(path: "icons/attachment.png"),
-                    variables: ["next_command": "get_attachment", "item_id": itemId, "attachment_id": att.id]
+                    variables: ["action": "get_attachment"]
                 )
             }
             AlfredOutput(items: alfredItems).printJSON()

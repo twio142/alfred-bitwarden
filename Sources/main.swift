@@ -19,8 +19,6 @@ case "show_item":
     ShowItem.run()
 case "get_field":
     GetField.run()
-case "next_field":
-    NextField.run()
 case "get_attachment":
     GetAttachment.run()
 case "set_favorite":
@@ -31,7 +29,7 @@ case "set_organization":
     SetOrganization.run()
 case "set_collection":
     SetCollection.run()
-case "rm":
+case "delete_item":
     DeleteItem.run()
 case "sync_vault":
     SyncVault.run()

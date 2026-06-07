@@ -1,10 +1,9 @@
 import Foundation
 
-struct DeleteItem {
+enum DeleteItem {
     static func run() {
         let args = Array(CommandLine.arguments.dropFirst(2))
-        let env = ProcessInfo.processInfo.environment
-        let itemId = args.first ?? env["item_id"] ?? ""
+        let itemId = args.first ?? ""
 
         guard !itemId.isEmpty else {
             AlfredOutput.error("Usage: rm <item_id>").printJSON()

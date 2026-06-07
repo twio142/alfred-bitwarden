@@ -1,6 +1,6 @@
 import Foundation
 
-struct CacheBuilder {
+enum CacheBuilder {
     static func build(from item: BWItem) -> CachedItem {
         let hasTOTP = item.login?.totp != nil ||
             item.fields?.contains { field in

@@ -1,9 +1,9 @@
 import Foundation
 
-struct Notifier {
+enum Notifier {
     static func notify(title: String, message: String) {
-        let enabled = ProcessInfo.processInfo.environment["bw_notifications"] ?? "true"
-        guard enabled.lowercased() != "false" && enabled != "0" else { return }
+        let enabled = ProcessInfo.processInfo.environment["PostNotification"] ?? "0"
+        guard enabled == "1" || enabled.lowercased() == "true" else { return }
 
         let script = """
         display notification "\(message.replacingOccurrences(of: "\"", with: "\\\""))" ¬

@@ -1,8 +1,11 @@
 import Foundation
 
-struct BWServer {
+enum BWServer {
     static var pidFile: String {
-        let dir = ProcessInfo.processInfo.environment["alfred_workflow_cache"] ?? "/tmp"
+        guard let dir = ProcessInfo.processInfo.environment["alfred_workflow_cache"] else {
+            AlfredOutput.error("alfred_workflow_cache is not set").printJSON()
+            exit(1)
+        }
         return dir + "/bw-serve.pid"
     }
 
@@ -15,12 +18,7 @@ struct BWServer {
         let proc = Process()
         proc.executableURL = URL(fileURLWithPath: "/usr/bin/env")
         proc.arguments = ["bw", "serve", "--port", "8087"]
-        if let token = BWClient.shared.sessionToken {
-            proc.environment = ProcessInfo.processInfo.environment.merging(
-                ["BW_SESSION": token]) { _, new in new }
-        } else {
-            proc.environment = ProcessInfo.processInfo.environment
-        }
+        proc.environment = ProcessInfo.processInfo.environment
         proc.standardOutput = FileHandle.nullDevice
         proc.standardError = FileHandle.nullDevice
         try? proc.run()
@@ -46,11 +44,10 @@ struct BWServer {
     }
 
     private static func writePID(_ pid: pid_t) {
-        let dir = ProcessInfo.processInfo.environment["alfred_workflow_cache"] ?? "/tmp"
-        try? FileManager.default.createDirectory(
-            atPath: dir, withIntermediateDirectories: true
-        )
-        try? "\(pid)".write(toFile: pidFile, atomically: true, encoding: .utf8)
+        let path = pidFile
+        let dir = (path as NSString).deletingLastPathComponent
+        try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+        try? "\(pid)".write(toFile: path, atomically: true, encoding: .utf8)
     }
 
     private static func cleanupStalePID() {

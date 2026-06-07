@@ -3,9 +3,16 @@ import Foundation
 extension VaultCache {
     static let currentSchemaVersion = 1
 
+    static var cacheDir: String {
+        guard let dir = ProcessInfo.processInfo.environment["alfred_workflow_cache"] else {
+            AlfredOutput.error("alfred_workflow_cache is not set").printJSON()
+            exit(1)
+        }
+        return dir
+    }
+
     static var cacheURL: URL {
-        let dir = ProcessInfo.processInfo.environment["alfred_workflow_cache"] ?? "/tmp"
-        return URL(fileURLWithPath: dir + "/vault-cache.json")
+        URL(fileURLWithPath: cacheDir + "/vault-cache.json")
     }
 
     static func load() -> VaultCache? {
@@ -18,10 +25,8 @@ extension VaultCache {
     }
 
     func save() {
-        let dir = ProcessInfo.processInfo.environment["alfred_workflow_cache"] ?? "/tmp"
-        try? FileManager.default.createDirectory(
-            atPath: dir, withIntermediateDirectories: true
-        )
+        let dir = VaultCache.cacheDir
+        try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .secondsSince1970
         if let data = try? encoder.encode(self) {

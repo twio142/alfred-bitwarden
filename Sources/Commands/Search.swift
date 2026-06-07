@@ -1,10 +1,10 @@
 import Foundation
 
-struct Search {
+enum Search {
     static func run() {
         let query = CommandLine.arguments.dropFirst(2).first ?? ""
         let env = ProcessInfo.processInfo.environment
-        let syncInterval = Int(env["bw_sync_interval"] ?? "60") ?? 60
+        let syncInterval = Int(env["SyncTime"] ?? "60") ?? 60
 
         guard let cache = VaultCache.load() else {
             AlfredOutput.loading("Vault cache empty — syncing…").printJSON()
@@ -30,9 +30,9 @@ struct Search {
             let q = query.lowercased()
             items = items.filter { item in
                 item.name.lowercased().contains(q) ||
-                item.login?.username?.lowercased().contains(q) == true ||
-                item.login?.uris?.first?.uri?.lowercased().contains(q) == true ||
-                item.notes?.lowercased().contains(q) == true
+                    item.login?.username?.lowercased().contains(q) == true ||
+                    item.login?.uris?.first?.uri?.lowercased().contains(q) == true ||
+                    item.notes?.lowercased().contains(q) == true
             }
         }
 
@@ -74,28 +74,31 @@ struct Search {
     private static func matchesDomain(item: CachedItem, domain: String) -> Bool {
         guard let uris = item.login?.uris else { return false }
         return uris.contains { uri in
-            guard let u = uri.uri, let itemDomain = URLMatcher.etld1(from: u) else { return false }
+            guard let uri = uri.uri, let itemDomain = URLMatcher.etld1(from: uri) else { return false }
             return itemDomain == domain
         }
     }
 
     static func makeAlfredItem(item: CachedItem, recency: RecencyStore) -> AlfredItem {
         let subtitle = buildSubtitle(item: item)
-        let icon = iconPath(for: item)
+        let isRecent = item.id == recency.lastItemId
+        let icon = isRecent ? "icons/clock.png" : iconPath(for: item)
+        let quicklookurl = item.login?.uris?.first?.uri
 
         let shiftMod: AlfredModItem? = item.hasTOTP
-            ? AlfredModItem(subtitle: "Copy TOTP code", arg: item.id, valid: true,
-                           variables: ["next_command": "get_field", "field": "totp"])
+            ? AlfredModItem(subtitle: "Copy TOTP code",
+                            arg: .multiple([item.id, "totp"]),
+                            variables: ["action": "get_field"])
             : nil
 
-        let defaultArg = item.id
-        let defaultVars: [String: String] = [
-            "item_id": item.id,
-            "item_type": "\(item.type.rawValue)",
-            "has_totp": item.hasTOTP ? "1" : "0",
-            "next_command": "get_field",
-            "field": defaultField(for: item)
-        ]
+        let (defaultArg, defaultVars): (AlfredArg, [String: String]) = {
+            switch item.type {
+            case .login: return (.multiple([item.id, "password"]), ["action": "get_field"])
+            case .secureNote: return (.multiple([item.id, "notes"]), ["action": "get_field"])
+            case .card: return (.multiple([item.id, "card_number"]), ["action": "get_field"])
+            case .identity: return (.single(item.id), ["action": "show_item"])
+            }
+        }()
 
         return AlfredItem(
             uid: item.id,
@@ -104,26 +107,21 @@ struct Search {
             arg: defaultArg,
             icon: AlfredIcon(path: icon),
             mods: AlfredMods(
-                ctrl: AlfredModItem(subtitle: "Copy username", arg: item.id, valid: item.login?.username != nil,
-                                   variables: ["next_command": "get_field", "field": "username"]),
                 shift: shiftMod,
-                cmd: AlfredModItem(subtitle: "Copy notes", arg: item.id, valid: item.notes != nil,
-                                  variables: ["next_command": "get_field", "field": "notes"]),
-                alt: AlfredModItem(subtitle: "More actions…", arg: item.id, valid: true,
-                                  variables: ["next_command": "more"]),
-                fn: AlfredModItem(subtitle: "Show all fields", arg: item.id, valid: true,
-                                 variables: ["next_command": "show_item"])
+                cmd: AlfredModItem(subtitle: "Copy username",
+                                   arg: .multiple([item.id, "username"]),
+                                   valid: item.login?.username != nil,
+                                   variables: ["action": "get_field"]),
+                alt: AlfredModItem(subtitle: "List fields",
+                                   arg: nil,
+                                   variables: ["next": "list_fields", "item_id": item.id]),
+                fn: AlfredModItem(subtitle: "More actions…",
+                                  arg: nil,
+                                  variables: ["next": "more", "item_id": item.id])
             ),
-            variables: defaultVars
+            variables: defaultVars,
+            quicklookurl: quicklookurl
         )
-    }
-
-    private static func defaultField(for item: CachedItem) -> String {
-        switch item.type {
-        case .login: return "password"
-        case .secureNote: return "notes"
-        case .card, .identity: return "show"
-        }
     }
 
     private static func buildSubtitle(item: CachedItem) -> String {
@@ -149,10 +147,13 @@ struct Search {
     private static func iconPath(for item: CachedItem) -> String {
         switch item.type {
         case .login: return "icons/login.png"
-        case .secureNote: return "icons/note.png"
-        case .card: return "icons/card.png"
+        case .secureNote: return "icons/sn.png"
+        case .card:
+            if let brand = item.card?.brand, !brand.isEmpty {
+                return "icons/\(brand).png"
+            }
+            return "icons/card.png"
         case .identity: return "icons/identity.png"
         }
     }
 }
-

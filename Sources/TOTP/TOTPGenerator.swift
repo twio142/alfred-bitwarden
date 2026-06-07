@@ -1,7 +1,7 @@
-import Foundation
 import CryptoKit
+import Foundation
 
-struct TOTPGenerator {
+enum TOTPGenerator {
     static func generate(secret: Data, digits: Int = 6, period: Int = 30) -> String? {
         let counter = UInt64(Date().timeIntervalSince1970) / UInt64(period)
         return generate(secret: secret, counter: counter, digits: digits)

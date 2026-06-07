@@ -8,7 +8,7 @@ extension AlfredOutput {
                 subtitle: message,
                 icon: AlfredIcon(path: "icons/error.png"),
                 valid: false
-            )
+            ),
         ])
     }
 
@@ -19,7 +19,7 @@ extension AlfredOutput {
                     title: message,
                     icon: AlfredIcon(path: "icons/sync.png"),
                     valid: false
-                )
+                ),
             ],
             rerun: 0.5
         )

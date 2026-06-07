@@ -1,6 +1,6 @@
 import Foundation
 
-struct BWSync {
+enum BWSync {
     @discardableResult
     static func sync() throws -> VaultCache {
         _ = try? BWClient.shared.post("/sync")

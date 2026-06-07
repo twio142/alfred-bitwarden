@@ -1,6 +1,6 @@
 import Foundation
 
-struct LockVault {
+enum LockVault {
     static func run() {
         do {
             try BWAuth.restLock()

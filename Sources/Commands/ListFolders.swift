@@ -1,6 +1,6 @@
 import Foundation
 
-struct ListFolders {
+enum ListFolders {
     static func run() {
         guard let cache = VaultCache.load() else {
             AlfredOutput.error("No vault cache — please sync first").printJSON()
@@ -9,7 +9,7 @@ struct ListFolders {
 
         if cache.folders.isEmpty {
             AlfredOutput(items: [
-                AlfredItem(title: "No folders found", subtitle: "Your vault has no folders", valid: false)
+                AlfredItem(title: "No folders found", subtitle: "Your vault has no folders", valid: false),
             ]).printJSON()
             return
         }
@@ -18,9 +18,9 @@ struct ListFolders {
             AlfredItem(
                 title: folder.name,
                 subtitle: "Search in \(folder.name)",
-                arg: folder.id,
+                arg: .single(folder.id),
                 icon: AlfredIcon(path: "icons/folder.png"),
-                variables: ["next_command": "search", "folder_id": folder.id]
+                variables: ["next": "search", "folder_id": folder.id]
             )
         }
         AlfredOutput(items: items).printJSON()

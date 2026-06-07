@@ -6,26 +6,30 @@ enum AuthError: Error {
     case noSessionToken
 }
 
-struct BWAuth {
+enum BWAuth {
     static func login(password: String? = nil) throws -> String {
         let env = ProcessInfo.processInfo.environment
-        let method = env["bw_login_method"] ?? "password"
-        let email = env["bw_email"] ?? ""
+        let method = env["loginMethod"] ?? "password"
+        let email = env["bwuser"] ?? ""
+
+        if let serverUrl = env["serverUrl"], !serverUrl.isEmpty {
+            _ = runProcess("bw", args: ["config", "server", serverUrl])
+        }
 
         var args: [String]
         var processEnv: [String: String] = env
 
-        if method == "apikey" {
+        if method == "api_key" {
             args = ["login", "--apikey"]
-            processEnv["BW_CLIENTID"] = env["bw_client_id"]
-            processEnv["BW_CLIENTSECRET"] = env["bw_client_secret"]
+            processEnv["BW_CLIENTID"] = env["BW_CLIENTID"]
+            processEnv["BW_CLIENTSECRET"] = env["BW_CLIENTSECRET"]
         } else {
             args = ["login", email, "--passwordenv", "BW_PASSWORD", "--raw"]
             if let p = password {
                 processEnv["BW_PASSWORD"] = p
             }
-            if let twoFA = env["bw_2fa_method"] {
-                args += ["--method", twoFA == "yubikey" ? "4" : twoFA == "email" ? "1" : "0"]
+            if let twoFA = env["twoStepMethod"], !twoFA.isEmpty {
+                args += ["--method", twoFA]
             }
         }
 
@@ -33,11 +37,7 @@ struct BWAuth {
         guard exitCode == 0 else {
             throw AuthError.loginFailed(output)
         }
-        let token = output.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !token.isEmpty {
-            BWClient.shared.sessionToken = token
-        }
-        return token
+        return output.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     static func logout() {
@@ -51,7 +51,6 @@ struct BWAuth {
         }
         let token = output.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !token.isEmpty else { throw AuthError.noSessionToken }
-        BWClient.shared.sessionToken = token
         return token
     }
 
@@ -80,8 +79,8 @@ extension BWAuth {
         let data = try BWClient.shared.post("/unlock", body: body)
         if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
            let dataObj = json["data"] as? [String: Any],
-           let raw = dataObj["raw"] as? String {
-            BWClient.shared.sessionToken = raw
+           let raw = dataObj["raw"] as? String
+        {
             return raw
         }
         throw AuthError.noSessionToken

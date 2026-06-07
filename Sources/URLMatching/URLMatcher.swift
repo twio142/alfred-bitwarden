@@ -1,7 +1,7 @@
 import Foundation
 
-struct URLMatcher {
-    // Known compound public suffixes
+enum URLMatcher {
+    /// Known compound public suffixes
     private static let compoundSuffixes: Set<String> = [
         "co.uk", "co.nz", "co.jp", "co.za", "co.in", "co.kr", "co.id",
         "com.au", "com.br", "com.mx", "com.ar", "com.tr", "com.sg",
@@ -16,7 +16,7 @@ struct URLMatcher {
         "com.cn", "net.cn", "org.cn", "gov.cn",
         "com.ru", "net.ru", "org.ru",
         "com.de", "com.fr", "com.it", "com.es",
-        "com.pe", "com.co", "com.ve", "com.cl"
+        "com.pe", "com.co", "com.ve", "com.cl",
     ]
 
     static func etld1(from urlString: String) -> String? {
@@ -39,7 +39,7 @@ struct URLMatcher {
         guard labels.count >= 2 else { return nil }
 
         let lastTwo = labels.suffix(2).joined(separator: ".")
-        if labels.count >= 3 && compoundSuffixes.contains(lastTwo) {
+        if labels.count >= 3, compoundSuffixes.contains(lastTwo) {
             return labels.suffix(3).joined(separator: ".")
         }
         return lastTwo
@@ -54,7 +54,7 @@ struct URLMatcher {
         return false
     }
 
-    // Browsers supported: Safari, Firefox, Chrome, Edge, Opera, Brave, Vivaldi, Ghost, Arc
+    /// Browsers supported: Safari, Firefox, Chrome, Edge, Opera, Brave, Vivaldi, Ghost, Arc
     static func browserURL() -> String? {
         let browsers: [(app: String, script: String)] = [
             ("Safari", "tell application \"Safari\" to return URL of current tab of front window"),
@@ -71,7 +71,7 @@ struct URLMatcher {
 
         for (app, script) in browsers {
             guard frontApp?.lowercased().contains(app.lowercased().components(separatedBy: " ").first ?? app) == true
-                  || frontApp == app
+                    || frontApp == app
             else { continue }
             if let url = runAppleScript(script) {
                 return url

@@ -1,6 +1,6 @@
 import Foundation
 
-struct LaunchAgent {
+enum LaunchAgent {
     static let label = "com.alfred.bw-alfred.sync"
     static var plistPath: String {
         let home = ProcessInfo.processInfo.environment["HOME"] ?? NSHomeDirectory()
@@ -9,7 +9,7 @@ struct LaunchAgent {
 
     static func install() throws {
         let env = ProcessInfo.processInfo.environment
-        let syncIntervalMinutes = Int(env["bw_sync_interval"] ?? "60") ?? 60
+        let syncIntervalMinutes = Int(env["SyncTime"] ?? "60") ?? 60
         let syncIntervalSeconds = syncIntervalMinutes * 60
 
         guard let binaryPath = Bundle.main.executableURL?.path

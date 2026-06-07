@@ -1,6 +1,6 @@
 import Foundation
 
-struct BWItems {
+enum BWItems {
     static func listItems(search: String? = nil) throws -> [BWItem] {
         var path = "/list/object/items"
         if let q = search, !q.isEmpty {
@@ -69,13 +69,16 @@ struct BWItems {
         _ = try BWClient.shared.delete("/object/item/\(id)")
     }
 
-    private static func decodeList(path: String, key: String) throws -> [BWItem] {
+    private static func decodeList(path: String, key _: String) throws -> [BWItem] {
         let data = try BWClient.shared.get(path)
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let dataObj = json["data"] as? [String: Any],
-              let arr = dataObj["data"]
+              let arr = dataObj["data"] as? [[String: Any]]
         else { return [] }
-        let arrData = try JSONSerialization.data(withJSONObject: arr)
-        return (try? JSONDecoder().decode([BWItem].self, from: arrData)) ?? []
+        let decoder = JSONDecoder()
+        return arr.compactMap { dict in
+            guard let itemData = try? JSONSerialization.data(withJSONObject: dict) else { return nil }
+            return try? decoder.decode(BWItem.self, from: itemData)
+        }
     }
 }

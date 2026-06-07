@@ -24,7 +24,7 @@ struct CachedItem: Codable {
     var fields: [CachedCustomField]?
     var hasAttachments: Bool
     var hasTOTP: Bool
-    var revisionDate: String
+    var revisionDate: String?
 }
 
 struct CachedLoginData: Codable {

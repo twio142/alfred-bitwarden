@@ -1,6 +1,6 @@
 import Foundation
 
-struct Base32 {
+enum Base32 {
     private static let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
     private static let decodeMap: [Character: UInt8] = {
         var map = [Character: UInt8]()

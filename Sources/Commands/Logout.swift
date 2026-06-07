@@ -1,8 +1,8 @@
 import Foundation
 
-struct Logout {
+enum Logout {
     static func run() {
-        let email = ProcessInfo.processInfo.environment["bw_email"] ?? ""
+        let email = ProcessInfo.processInfo.environment["bwuser"] ?? ""
         _ = try? BWAuth.restLock()
         BWAuth.logout()
         try? Keychain.delete(for: email)

@@ -1,6 +1,6 @@
 import Foundation
 
-struct Login {
+enum Login {
     static func run() {
         do {
             try ensureUnlocked()

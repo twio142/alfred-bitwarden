@@ -1,9 +1,9 @@
 import Foundation
 
-struct Unlock {
+enum Unlock {
     static func run() {
         let env = ProcessInfo.processInfo.environment
-        let email = env["bw_email"] ?? ""
+        let email = env["bwuser"] ?? ""
 
         do {
             // Try Keychain first

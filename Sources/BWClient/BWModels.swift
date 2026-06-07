@@ -44,7 +44,7 @@ struct BWItem: Codable {
     var notes: String?
     var fields: [BWCustomField]?
     var attachments: [BWAttachment]?
-    var revisionDate: String
+    var revisionDate: String?
 }
 
 struct BWLoginData: Codable {

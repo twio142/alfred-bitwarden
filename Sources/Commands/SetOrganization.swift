@@ -1,6 +1,6 @@
 import Foundation
 
-struct SetOrganization {
+enum SetOrganization {
     static func run() {
         let args = Array(CommandLine.arguments.dropFirst(2))
         let orgId = args.first
@@ -13,7 +13,7 @@ struct SetOrganization {
             AlfredOutput.single(AlfredItem(
                 title: id == "all" ? "Showing all vaults" : "Vault filter set",
                 subtitle: id == "all" ? "No organization filter applied" : "Filtered to organization",
-                icon: AlfredIcon(path: "icons/org.png"),
+                icon: AlfredIcon(path: "icons/company.png"),
                 valid: false
             )).printJSON()
             return
@@ -28,18 +28,18 @@ struct SetOrganization {
             AlfredItem(
                 title: "All Vaults",
                 subtitle: "Show items from all organizations",
-                arg: "all",
-                icon: AlfredIcon(path: "icons/org.png"),
-                variables: ["next_command": "set_organization", "org_id": "all"]
-            )
+                arg: .single("all"),
+                icon: AlfredIcon(path: "icons/company.png"),
+                variables: ["next": "set_organization", "org_id": "all"]
+            ),
         ]
         items += cache.organizations.map { org in
             AlfredItem(
                 title: org.name,
                 subtitle: "Filter to this organization",
-                arg: org.id,
-                icon: AlfredIcon(path: "icons/org.png"),
-                variables: ["next_command": "set_organization", "org_id": org.id]
+                arg: .single(org.id),
+                icon: AlfredIcon(path: "icons/company.png"),
+                variables: ["next": "set_organization", "org_id": org.id]
             )
         }
         AlfredOutput(items: items).printJSON()

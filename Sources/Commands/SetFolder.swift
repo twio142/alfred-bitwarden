@@ -1,6 +1,6 @@
 import Foundation
 
-struct SetFolder {
+enum SetFolder {
     static func run() {
         let args = Array(CommandLine.arguments.dropFirst(2))
         let env = ProcessInfo.processInfo.environment
@@ -12,30 +12,8 @@ struct SetFolder {
             return
         }
 
-        if folderId == nil {
-            // Show folder list
-            guard let cache = VaultCache.load() else {
-                AlfredOutput.error("No vault cache").printJSON()
-                return
-            }
-            var items: [AlfredItem] = [
-                AlfredItem(
-                    title: "No Folder",
-                    subtitle: "Remove from all folders",
-                    arg: itemId,
-                    icon: AlfredIcon(path: "icons/folder.png"),
-                    variables: ["next_command": "set_folder", "item_id": itemId, "folder_id": "null"]
-                )
-            ]
-            items += cache.folders.map { folder in
-                AlfredItem(
-                    title: folder.name,
-                    arg: itemId,
-                    icon: AlfredIcon(path: "icons/folder.png"),
-                    variables: ["next_command": "set_folder", "item_id": itemId, "folder_id": folder.id]
-                )
-            }
-            AlfredOutput(items: items).printJSON()
+        guard let folderId else {
+            showFolderList(for: itemId)
             return
         }
 
@@ -58,5 +36,30 @@ struct SetFolder {
         } catch {
             AlfredOutput.error("Error: \(error)").printJSON()
         }
+    }
+
+    private static func showFolderList(for itemId: String) {
+        guard let cache = VaultCache.load() else {
+            AlfredOutput.error("No vault cache").printJSON()
+            return
+        }
+        var items: [AlfredItem] = [
+            AlfredItem(
+                title: "No Folder",
+                subtitle: "Remove from all folders",
+                arg: .multiple([itemId, "null"]),
+                icon: AlfredIcon(path: "icons/folder.png"),
+                variables: ["action": "set_folder"]
+            ),
+        ]
+        items += cache.folders.map { folder in
+            AlfredItem(
+                title: folder.name,
+                arg: .multiple([itemId, folder.id]),
+                icon: AlfredIcon(path: "icons/folder.png"),
+                variables: ["action": "set_folder"]
+            )
+        }
+        AlfredOutput(items: items).printJSON()
     }
 }

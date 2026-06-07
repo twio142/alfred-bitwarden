@@ -1,18 +1,18 @@
 import Foundation
 
-struct GetAttachment {
+enum GetAttachment {
     static func run() {
         let args = Array(CommandLine.arguments.dropFirst(2))
         let env = ProcessInfo.processInfo.environment
-        let itemId = args.first ?? env["item_id"] ?? ""
-        let attachmentId = args.dropFirst().first ?? env["attachment_id"] ?? ""
+        let itemId = args.first ?? ""
+        let attachmentId = args.dropFirst().first ?? ""
 
         guard !itemId.isEmpty, !attachmentId.isEmpty else {
             AlfredOutput.error("Usage: get_attachment <item_id> <attachment_id>").printJSON()
             return
         }
 
-        var downloadsFolder = env["bw_downloads_folder"] ?? ""
+        var downloadsFolder = env["downloadFolder"] ?? ""
         if downloadsFolder.isEmpty {
             guard let prompted = promptDownloadFolder() else {
                 AlfredOutput.error("No download folder specified").printJSON()

@@ -1,6 +1,6 @@
 import Foundation
 
-struct SyncVault {
+enum SyncVault {
     static func run() {
         do {
             try ensureUnlocked()

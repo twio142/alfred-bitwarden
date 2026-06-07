@@ -6,7 +6,7 @@ struct ServerState {
     var status: VaultStatus
 }
 
-struct BWStatus {
+enum BWStatus {
     static func get() throws -> ServerState {
         let data = try BWClient.shared.get("/status")
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],

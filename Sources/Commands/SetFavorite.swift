@@ -1,11 +1,10 @@
 import Foundation
 
-struct SetFavorite {
+enum SetFavorite {
     static func run() {
         let args = Array(CommandLine.arguments.dropFirst(2))
-        let env = ProcessInfo.processInfo.environment
-        let itemId = args.first ?? env["item_id"] ?? ""
-        let favoriteStr = args.dropFirst().first ?? env["favorite"] ?? "true"
+        let itemId = args.first ?? ""
+        let favoriteStr = args.dropFirst().first ?? "true"
         let favorite = favoriteStr.lowercased() == "true" || favoriteStr == "1"
 
         guard !itemId.isEmpty else {

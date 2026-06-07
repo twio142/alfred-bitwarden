@@ -8,24 +8,31 @@ enum KeychainError: Error {
     case deleteError(OSStatus)
 }
 
-struct Keychain {
-    static let serviceName = "bw-alfred"
+enum Keychain {
+    static let label = "Bitwarden Master Password"
+
+    private static func service() -> String {
+        ProcessInfo.processInfo.environment["serverUrl"] ?? "bw-alfred"
+    }
 
     static func save(password: String, for account: String) throws {
         guard let data = password.data(using: .utf8) else { return }
+        let svc = service()
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: serviceName,
-            kSecAttrAccount as String: account
+            kSecAttrService as String: svc,
+            kSecAttrAccount as String: account,
         ]
         let attributes: [String: Any] = [
             kSecValueData as String: data,
-            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked
+            kSecAttrLabel as String: label,
+            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked,
         ]
         let status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
         if status == errSecItemNotFound {
             var addQuery = query
             addQuery[kSecValueData as String] = data
+            addQuery[kSecAttrLabel as String] = label
             addQuery[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlocked
             let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
             if addStatus != errSecSuccess {
@@ -39,10 +46,10 @@ struct Keychain {
     static func load(for account: String) throws -> String {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: serviceName,
+            kSecAttrService as String: service(),
             kSecAttrAccount as String: account,
             kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne
+            kSecMatchLimit as String: kSecMatchLimitOne,
         ]
         var item: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &item)
@@ -61,11 +68,11 @@ struct Keychain {
     static func delete(for account: String) throws {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: serviceName,
-            kSecAttrAccount as String: account
+            kSecAttrService as String: service(),
+            kSecAttrAccount as String: account,
         ]
         let status = SecItemDelete(query as CFDictionary)
-        if status != errSecSuccess && status != errSecItemNotFound {
+        if status != errSecSuccess, status != errSecItemNotFound {
             throw KeychainError.deleteError(status)
         }
     }

@@ -1,6 +1,6 @@
 import Foundation
 
-struct ShowItem {
+enum ShowItem {
     static func run() {
         let args = Array(CommandLine.arguments.dropFirst(2))
         guard let itemId = args.first else {
@@ -35,47 +35,49 @@ struct ShowItem {
     }
 
     private static func buildDetails(item: CachedItem) -> String {
-        var lines: [String] = []
-        lines.append("Name: \(item.name)")
-
+        var lines = ["Name: \(item.name)"]
         switch item.type {
-        case .login:
-            if let username = item.login?.username { lines.append("Username: \(username)") }
-            if item.hasTOTP { lines.append("TOTP: [available]") }
-            if let uris = item.login?.uris {
-                for (i, uri) in uris.enumerated() {
-                    if let u = uri.uri { lines.append("URL \(i + 1): \(u)") }
-                }
-            }
-        case .card:
-            if let name = item.card?.cardholderName { lines.append("Cardholder: \(name)") }
-            if let brand = item.card?.brand { lines.append("Brand: \(brand)") }
-            let exp = [item.card?.expMonth, item.card?.expYear].compactMap { $0 }.joined(separator: "/")
-            if !exp.isEmpty { lines.append("Expires: \(exp)") }
-        case .identity:
-            if let id = item.identity {
-                let name = [id.firstName, id.middleName, id.lastName].compactMap { $0 }.joined(separator: " ")
-                if !name.isEmpty { lines.append("Name: \(name)") }
-                if let email = id.email { lines.append("Email: \(email)") }
-                if let phone = id.phone { lines.append("Phone: \(phone)") }
-                if let company = id.company { lines.append("Company: \(company)") }
-            }
-        case .secureNote:
-            break
+        case .login: lines += loginLines(item)
+        case .card: lines += cardLines(item)
+        case .identity: lines += identityLines(item)
+        case .secureNote: break
         }
-
-        if let notes = item.notes, !notes.isEmpty {
-            lines.append("Notes: \(notes.prefix(200))")
-        }
-
+        if let notes = item.notes, !notes.isEmpty { lines.append("Notes: \(notes.prefix(200))") }
         if let fields = item.fields {
             for field in fields where field.type != .hidden {
-                if let name = field.name, let value = field.value {
-                    lines.append("\(name): \(value)")
-                }
+                if let name = field.name, let value = field.value { lines.append("\(name): \(value)") }
             }
         }
-
         return lines.joined(separator: "\n")
+    }
+
+    private static func loginLines(_ item: CachedItem) -> [String] {
+        var lines: [String] = []
+        if let username = item.login?.username { lines.append("Username: \(username)") }
+        if item.hasTOTP { lines.append("TOTP: [available]") }
+        for (i, uri) in (item.login?.uris ?? []).enumerated() {
+            if let u = uri.uri { lines.append("URL \(i + 1): \(u)") }
+        }
+        return lines
+    }
+
+    private static func cardLines(_ item: CachedItem) -> [String] {
+        var lines: [String] = []
+        if let name = item.card?.cardholderName { lines.append("Cardholder: \(name)") }
+        if let brand = item.card?.brand { lines.append("Brand: \(brand)") }
+        let exp = [item.card?.expMonth, item.card?.expYear].compactMap { $0 }.joined(separator: "/")
+        if !exp.isEmpty { lines.append("Expires: \(exp)") }
+        return lines
+    }
+
+    private static func identityLines(_ item: CachedItem) -> [String] {
+        guard let id = item.identity else { return [] }
+        var lines: [String] = []
+        let name = [id.firstName, id.middleName, id.lastName].compactMap { $0 }.joined(separator: " ")
+        if !name.isEmpty { lines.append("Name: \(name)") }
+        if let email = id.email { lines.append("Email: \(email)") }
+        if let phone = id.phone { lines.append("Phone: \(phone)") }
+        if let company = id.company { lines.append("Company: \(company)") }
+        return lines
     }
 }
