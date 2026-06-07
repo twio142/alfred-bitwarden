@@ -17,7 +17,9 @@ enum Search {
         var items = applyFilters(to: cache.items, prefs: prefs, env: env, query: query)
 
         // Browser URL matching
-        let browserDomain = URLMatcher.browserURL().flatMap { URLMatcher.etld1(from: $0) }
+        let browser = URLMatcher.browserInfo()
+        let browserDomain = browser.flatMap { URLMatcher.etld1(from: $0.url) }
+        let browserBundleId = browserDomain != nil ? browser?.bundleId : nil
 
         // Rank items
         items.sort { a, b in
@@ -34,7 +36,9 @@ enum Search {
         }
 
         let alfredItems = items.map { item -> AlfredItem in
-            makeAlfredItem(item: item, recency: recency)
+            let matchedBundleId = browserDomain != nil && matchesDomain(item: item, domain: browserDomain!)
+                ? browserBundleId : nil
+            return makeAlfredItem(item: item, recency: recency, browserBundleId: matchedBundleId)
         }
 
         let output = alfredItems.isEmpty
@@ -83,10 +87,17 @@ enum Search {
         }
     }
 
-    static func makeAlfredItem(item: CachedItem, recency: RecencyStore) -> AlfredItem {
+    static func makeAlfredItem(item: CachedItem, recency: RecencyStore, browserBundleId: String? = nil) -> AlfredItem {
         let subtitle = buildSubtitle(item: item)
         let isRecent = recency.isRecent(for: item.id)
-        let icon = isRecent ? "icons/clock.png" : iconPath(for: item)
+        let icon: String
+        if let bundleId = browserBundleId {
+            icon = "icons/\(bundleId).png"
+        } else if isRecent {
+            icon = "icons/clock.png"
+        } else {
+            icon = iconPath(for: item)
+        }
         let quicklookurl = item.login?.uris?.first?.uri
 
         let shiftMod: AlfredModItem? = item.hasTOTP
