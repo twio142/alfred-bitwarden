@@ -54,7 +54,7 @@ enum ListFields {
 
         if let notes = item.notes, !notes.isEmpty {
             items.append(AlfredItem(title: "Notes", subtitle: String(notes.prefix(60)), arg: .multiple([itemId, "notes"]),
-                                    icon: AlfredIcon(path: "icons/icon.png"), variables: action))
+                                    icon: AlfredIcon(path: "icons/note.png"), variables: action))
         }
 
         for (index, uri) in (item.login?.uris ?? []).enumerated() {
@@ -68,7 +68,7 @@ enum ListFields {
             for field in fields where field.type == .text {
                 if let name = field.name, let value = field.value {
                     items.append(AlfredItem(title: name, subtitle: value, arg: .multiple([itemId, "custom:\(name)"]),
-                                            icon: AlfredIcon(path: "icons/icon.png"), variables: action))
+                                            variables: action))
                 }
             }
         }
