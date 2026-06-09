@@ -75,4 +75,3 @@ final class BWClient: @unchecked Sendable {
         return try box.result!.get()
     }
 }
-
