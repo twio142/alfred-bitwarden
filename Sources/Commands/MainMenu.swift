@@ -84,25 +84,25 @@ enum MainMenu {
     private static func unlockedMenuItems() -> [AlfredItem] {
         [
             AlfredItem(title: "Search Vault", subtitle: "Search all items",
-                       arg: .single("search"), icon: AlfredIcon(path: "icons/search.png"), variables: ["next": "search"]),
+                       arg: .single("search"), icon: AlfredIcon(path: "icons/search.png"), variables: ["next": "search", "nav_stack": "main"]),
             AlfredItem(title: "Browse Folders", subtitle: "Browse items by folder",
                        arg: .single("list_folders"), icon: AlfredIcon(path: "icons/folder.png"),
-                       variables: ["next": "list_folders"]),
+                       variables: ["next": "list_folders", "nav_stack": "main"]),
             AlfredItem(title: "Browse by Type", subtitle: "Filter by login, card, identity, or secure note",
-                       arg: .single("list_types"), variables: ["next": "list_types"]),
+                       arg: .single("list_types"), variables: ["next": "list_types", "nav_stack": "main"]),
             AlfredItem(title: "Lock Vault", subtitle: "Lock the vault",
                        arg: .single("lock"), icon: AlfredIcon(path: "icons/lock.png"), variables: ["action": "lock"]),
             AlfredItem(title: "Filter by Vault", subtitle: "Set default organization",
                        arg: .single("set_organization"), icon: AlfredIcon(path: "icons/company.png"),
-                       variables: ["next": "set_organization"]),
+                       variables: ["next": "set_organization", "nav_stack": "main"]),
             AlfredItem(title: "Filter by Collection", subtitle: "Set default collection",
-                       arg: .single("set_collection"), variables: ["next": "set_collection"]),
+                       arg: .single("set_collection"), variables: ["next": "set_collection", "nav_stack": "main"]),
             AlfredItem(title: "Sync Vault", subtitle: "Refresh vault cache from server",
                        arg: .single("sync_vault"), icon: AlfredIcon(path: "icons/refresh.png"), variables: ["action": "sync_vault"]),
             AlfredItem(title: "Logout", subtitle: "Switch account or reset",
                        arg: .single("logout"), icon: AlfredIcon(path: "icons/exit.png"), variables: ["action": "logout"]),
             AlfredItem(title: "Manage Sync Agent", subtitle: "Install or uninstall background sync",
-                       arg: .single("manage_agent"), icon: AlfredIcon(path: "icons/gear.png"), variables: ["next": "manage_agent"]),
+                       arg: .single("manage_agent"), icon: AlfredIcon(path: "icons/gear.png"), variables: ["next": "manage_agent", "nav_stack": "main"]),
         ]
     }
 }
