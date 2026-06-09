@@ -49,7 +49,7 @@ enum SetFolder {
                 title: "No Folder",
                 subtitle: "Remove from all folders",
                 arg: .multiple([itemId, "null"]),
-                icon: AlfredIcon(path: "icons/folder.png"),
+                icon: AlfredIcon(path: "icons/cancel.png"),
                 variables: ["action": "set_folder"]
             ),
         ]

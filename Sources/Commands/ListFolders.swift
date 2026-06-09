@@ -31,6 +31,7 @@ enum ListFolders {
         let favoritesItem = AlfredItem(
             title: "Favorites",
             subtitle: "Show favorite items",
+            icon: AlfredIcon(path: "icons/heart.png"),
             variables: ["next": "search", "favorites": "true", "folder_id": "", "nav_stack": pushed]
         )
         let folderItems = cache.folders.map { folder in

@@ -29,6 +29,7 @@ enum MoreMenu {
                 title: isFavorite ? "Remove from Favorites" : "Mark as Favorite",
                 subtitle: isFavorite ? "Remove this item from favorites" : "Add this item to favorites",
                 arg: .multiple([itemId, isFavorite ? "false" : "true"]),
+                icon: AlfredIcon(path: isFavorite ? "icons/cancel.png" : "icons/heart.png"),
                 variables: ["action": "set_favorite"]
             ),
             AlfredItem(
@@ -45,6 +46,7 @@ enum MoreMenu {
                 title: "Download Attachment",
                 subtitle: "Download an attachment",
                 arg: nil,
+                icon: AlfredIcon(path: "icons/attachment.png"),
                 variables: ["next": "list_attachments", "item_id": itemId, "nav_stack": pushed]
             ))
         }
@@ -53,6 +55,7 @@ enum MoreMenu {
             title: "Delete Item",
             subtitle: "Move this item to Trash",
             arg: .single(itemId),
+            icon: AlfredIcon(path: "icons/trash.png"),
             variables: ["action": "delete_item"]
         ))
 

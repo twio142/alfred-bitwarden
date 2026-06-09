@@ -84,25 +84,23 @@ enum MainMenu {
     private static func unlockedMenuItems() -> [AlfredItem] {
         [
             AlfredItem(title: "Search Vault", subtitle: "Search all items",
-                       arg: .single("search"), variables: ["next": "search"]),
+                       arg: .single("search"), icon: AlfredIcon(path: "icons/search.png"), variables: ["next": "search"]),
             AlfredItem(title: "Browse Folders", subtitle: "Browse items by folder",
                        arg: .single("list_folders"), icon: AlfredIcon(path: "icons/folder.png"),
                        variables: ["next": "list_folders"]),
             AlfredItem(title: "Lock Vault", subtitle: "Lock the vault",
-                       arg: .single("lock"), variables: ["action": "lock"]),
+                       arg: .single("lock"), icon: AlfredIcon(path: "icons/lock.png"), variables: ["action": "lock"]),
             AlfredItem(title: "Filter by Vault", subtitle: "Set default organization",
                        arg: .single("set_organization"), icon: AlfredIcon(path: "icons/company.png"),
                        variables: ["next": "set_organization"]),
             AlfredItem(title: "Filter by Collection", subtitle: "Set default collection",
                        arg: .single("set_collection"), variables: ["next": "set_collection"]),
             AlfredItem(title: "Sync Vault", subtitle: "Refresh vault cache from server",
-                       arg: .single("sync_vault"), variables: ["action": "sync_vault"]),
+                       arg: .single("sync_vault"), icon: AlfredIcon(path: "icons/refresh.png"), variables: ["action": "sync_vault"]),
             AlfredItem(title: "Logout", subtitle: "Switch account or reset",
-                       arg: .single("logout"), variables: ["action": "logout"]),
+                       arg: .single("logout"), icon: AlfredIcon(path: "icons/exit.png"), variables: ["action": "logout"]),
             AlfredItem(title: "Manage Sync Agent", subtitle: "Install or uninstall background sync",
-                       arg: .single("manage_agent"), variables: ["next": "manage_agent"]),
-            AlfredItem(title: "Configure Workflow", subtitle: "Workflow settings",
-                       arg: .single("configure"), valid: false),
+                       arg: .single("manage_agent"), icon: AlfredIcon(path: "icons/gear.png"), variables: ["next": "manage_agent"]),
         ]
     }
 }

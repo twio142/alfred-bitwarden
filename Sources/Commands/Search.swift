@@ -175,7 +175,7 @@ enum Search {
     private static func iconPath(for item: CachedItem) -> String {
         switch item.type {
         case .login: return "icons/login.png"
-        case .secureNote: return "icons/sn.png"
+        case .secureNote: return "icons/secret-note.png"
         case .card:
             if let brand = item.card?.brand, !brand.isEmpty {
                 return "icons/\(brand).png"
