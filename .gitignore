@@ -10,3 +10,8 @@ Packages/
 .idea/
 prefs.plist
 icons/
+/.claude/skills
+/.specify/extensions
+/.specify/integrations
+/.specify/scripts/bash
+/.specify/workflows
