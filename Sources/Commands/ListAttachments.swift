@@ -37,13 +37,22 @@ enum ListAttachments {
                 return
             }
 
-            let alfredItems = attachments.map { att in
+            var alfredItems = attachments.map { att in
                 AlfredItem(
                     title: att.fileName ?? att.id,
                     subtitle: att.sizeName ?? att.size ?? "Unknown size",
                     arg: .multiple([itemId, att.id]),
                     variables: ["action": "get_attachment"]
                 )
+            }
+            let (popped, remaining) = NavStack.pop(from: env["nav_stack"] ?? "")
+            if let popped {
+                alfredItems.append(AlfredItem(
+                    title: "Go Back",
+                    subtitle: "Return to previous menu",
+                    arg: nil,
+                    variables: ["next": popped, "nav_stack": remaining]
+                ))
             }
             AlfredOutput(items: alfredItems).printJSON()
         } catch {

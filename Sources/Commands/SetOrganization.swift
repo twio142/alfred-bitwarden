@@ -24,6 +24,7 @@ enum SetOrganization {
             return
         }
 
+        let env = ProcessInfo.processInfo.environment
         var items: [AlfredItem] = [
             AlfredItem(
                 title: "All Vaults",
@@ -41,6 +42,15 @@ enum SetOrganization {
                 icon: AlfredIcon(path: "icons/company.png"),
                 variables: ["next": "set_organization", "org_id": org.id]
             )
+        }
+        let (popped, remaining) = NavStack.pop(from: env["nav_stack"] ?? "")
+        if let popped {
+            items.append(AlfredItem(
+                title: "Go Back",
+                arg: nil,
+                icon: AlfredIcon(path: "icons/back.png"),
+                variables: ["next": popped, "nav_stack": remaining]
+            ))
         }
         AlfredOutput(items: items).printJSON()
     }

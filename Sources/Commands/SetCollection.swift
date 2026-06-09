@@ -28,6 +28,7 @@ enum SetCollection {
             collections = collections.filter { $0.organizationId == orgId }
         }
 
+        let env = ProcessInfo.processInfo.environment
         var items: [AlfredItem] = [
             AlfredItem(
                 title: "All Collections",
@@ -43,6 +44,15 @@ enum SetCollection {
                 arg: .single(col.id),
                 variables: ["next": "set_collection", "collection_id": col.id]
             )
+        }
+        let (popped, remaining) = NavStack.pop(from: env["nav_stack"] ?? "")
+        if let popped {
+            items.append(AlfredItem(
+                title: "Go Back",
+                arg: nil,
+                icon: AlfredIcon(path: "icons/back.png"),
+                variables: ["next": popped, "nav_stack": remaining]
+            ))
         }
         AlfredOutput(items: items).printJSON()
     }

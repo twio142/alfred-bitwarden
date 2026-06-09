@@ -17,12 +17,20 @@ enum ListFields {
             return
         }
 
-        let alfredItems = makeItems(for: item, itemId: itemId)
+        var alfredItems = makeItems(for: item, itemId: itemId)
         if alfredItems.isEmpty {
-            AlfredOutput(items: [AlfredItem(title: "No fields available", valid: false)]).printJSON()
-        } else {
-            AlfredOutput(items: alfredItems).printJSON()
+            alfredItems = [AlfredItem(title: "No fields available", valid: false)]
         }
+        let (popped, remaining) = NavStack.pop(from: env["nav_stack"] ?? "")
+        if let popped {
+            alfredItems.append(AlfredItem(
+                title: "Go Back",
+                arg: nil,
+                icon: AlfredIcon(path: "icons/back.png"),
+                variables: ["next": popped, "nav_stack": remaining]
+            ))
+        }
+        AlfredOutput(items: alfredItems).printJSON()
     }
 
     private static func makeItems(for item: CachedItem, itemId: String) -> [AlfredItem] {

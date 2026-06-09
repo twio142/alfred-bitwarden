@@ -43,6 +43,7 @@ enum SetFolder {
             AlfredOutput.error("No vault cache").printJSON()
             return
         }
+        let env = ProcessInfo.processInfo.environment
         var items: [AlfredItem] = [
             AlfredItem(
                 title: "No Folder",
@@ -59,6 +60,15 @@ enum SetFolder {
                 icon: AlfredIcon(path: "icons/folder.png"),
                 variables: ["action": "set_folder"]
             )
+        }
+        let (popped, remaining) = NavStack.pop(from: env["nav_stack"] ?? "")
+        if let popped {
+            items.append(AlfredItem(
+                title: "Go Back",
+                arg: nil,
+                icon: AlfredIcon(path: "icons/back.png"),
+                variables: ["next": popped, "nav_stack": remaining]
+            ))
         }
         AlfredOutput(items: items).printJSON()
     }
