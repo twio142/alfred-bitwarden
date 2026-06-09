@@ -19,7 +19,7 @@ enum Search {
         // Browser URL matching
         let browser = URLMatcher.browserInfo()
         let browserDomain = browser.flatMap { URLMatcher.etld1(from: $0.url) }
-        let browserBundleId = browserDomain != nil ? browser?.bundleId : nil
+        let browserPath = browserDomain != nil ? browser?.path : nil
 
         // Rank items
         items.sort { a, b in
@@ -36,9 +36,9 @@ enum Search {
         }
 
         let alfredItems = items.map { item -> AlfredItem in
-            let matchedBundleId = browserDomain != nil && matchesDomain(item: item, domain: browserDomain!)
-                ? browserBundleId : nil
-            return makeAlfredItem(item: item, recency: recency, browserBundleId: matchedBundleId, navStack: env["nav_stack"] ?? "")
+            let matchedBrowserPath = browserDomain != nil && matchesDomain(item: item, domain: browserDomain!)
+                ? browserPath : nil
+            return makeAlfredItem(item: item, recency: recency, browserPath: matchedBrowserPath, navStack: env["nav_stack"] ?? "")
         }
 
         AlfredOutput(items: makeOutputItems(alfredItems: alfredItems, navStack: env["nav_stack"] ?? "")).printJSON()
@@ -103,16 +103,16 @@ enum Search {
         return output
     }
 
-    static func makeAlfredItem(item: CachedItem, recency: RecencyStore, browserBundleId: String? = nil, navStack: String = "") -> AlfredItem {
+    static func makeAlfredItem(item: CachedItem, recency: RecencyStore, browserPath: String? = nil, navStack: String = "") -> AlfredItem {
         let subtitle = buildSubtitle(item: item)
         let isRecent = recency.isRecent(for: item.id)
-        let icon: String
-        if let bundleId = browserBundleId {
-            icon = "icons/\(bundleId).png"
+        let icon: AlfredIcon
+        if let path = browserPath {
+            icon = AlfredIcon(path: path, type: "fileicon")
         } else if isRecent {
-            icon = "icons/clock.png"
+            icon = AlfredIcon(path: "icons/clock.png")
         } else {
-            icon = iconPath(for: item)
+            icon = AlfredIcon(path: iconPath(for: item))
         }
         let quicklookurl = item.login?.uris?.first?.uri
 
@@ -136,7 +136,7 @@ enum Search {
             title: item.name,
             subtitle: subtitle,
             arg: defaultArg,
-            icon: AlfredIcon(path: icon),
+            icon: icon,
             mods: AlfredMods(
                 shift: shiftMod,
                 cmd: AlfredModItem(subtitle: "Copy username",

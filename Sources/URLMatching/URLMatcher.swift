@@ -56,7 +56,7 @@ enum URLMatcher {
     }
 
     /// Browsers supported: Safari, Firefox, Chrome, Edge, Opera, Brave, Vivaldi, Arc
-    static func browserInfo() -> (url: String, bundleId: String)? {
+    static func browserInfo() -> (url: String, path: String)? {
         let browsers: [(app: String, script: String)] = [
             ("Safari", "tell application \"Safari\" to return URL of current tab of front window"),
             ("Firefox", "tell application \"Firefox\" to return URL of active tab of front window"),
@@ -70,14 +70,14 @@ enum URLMatcher {
 
         guard let app = NSWorkspace.shared.menuBarOwningApplication,
               let frontApp = app.localizedName,
-              let bundleId = app.bundleIdentifier
+              let appPath = app.bundleURL?.path
         else { return nil }
 
         for (name, script) in browsers {
             guard frontApp.lowercased().contains(name.lowercased().components(separatedBy: " ").first ?? name) == true
                     || frontApp == name
             else { continue }
-            if let url = runAppleScript(script) { return (url, bundleId) }
+            if let url = runAppleScript(script) { return (url, appPath) }
         }
         return nil
     }
