@@ -88,6 +88,8 @@ enum MainMenu {
             AlfredItem(title: "Browse Folders", subtitle: "Browse items by folder",
                        arg: .single("list_folders"), icon: AlfredIcon(path: "icons/folder.png"),
                        variables: ["next": "list_folders"]),
+            AlfredItem(title: "Browse by Type", subtitle: "Filter by login, card, identity, or secure note",
+                       arg: .single("list_types"), variables: ["next": "list_types"]),
             AlfredItem(title: "Lock Vault", subtitle: "Lock the vault",
                        arg: .single("lock"), icon: AlfredIcon(path: "icons/lock.png"), variables: ["action": "lock"]),
             AlfredItem(title: "Filter by Vault", subtitle: "Set default organization",
