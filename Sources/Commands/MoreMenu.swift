@@ -3,7 +3,9 @@ import Foundation
 enum MoreMenu {
     static func run() {
         let args = Array(CommandLine.arguments.dropFirst(2))
-        guard let itemId = args.first else {
+        let env = ProcessInfo.processInfo.environment
+        let itemId = args.first ?? env["item_id"] ?? ""
+        guard !itemId.isEmpty else {
             AlfredOutput.error("Usage: more <item_id>").printJSON()
             return
         }
@@ -15,8 +17,14 @@ enum MoreMenu {
             return
         }
 
+        AlfredOutput(items: makeItems(itemId: itemId, item: item, env: env)).printJSON()
+    }
+
+    static func makeItems(itemId: String, item: CachedItem, env: [String: String]) -> [AlfredItem] {
+        let navStack = env["nav_stack"] ?? ""
+        let pushed = NavStack.push("more", onto: navStack)
         let isFavorite = item.favorite
-        var alfredItems: [AlfredItem] = [
+        var items: [AlfredItem] = [
             AlfredItem(
                 title: isFavorite ? "Remove from Favorites" : "Mark as Favorite",
                 subtitle: isFavorite ? "Remove this item from favorites" : "Add this item to favorites",
@@ -28,26 +36,36 @@ enum MoreMenu {
                 subtitle: "Change the folder for this item",
                 arg: nil,
                 icon: AlfredIcon(path: "icons/folder.png"),
-                variables: ["next": "set_folder", "item_id": itemId]
+                variables: ["next": "set_folder", "item_id": itemId, "nav_stack": pushed]
             ),
         ]
 
         if item.hasAttachments {
-            alfredItems.append(AlfredItem(
+            items.append(AlfredItem(
                 title: "Download Attachment",
                 subtitle: "Download an attachment",
                 arg: nil,
-                variables: ["next": "list_attachments", "item_id": itemId]
+                variables: ["next": "list_attachments", "item_id": itemId, "nav_stack": pushed]
             ))
         }
 
-        alfredItems.append(AlfredItem(
+        items.append(AlfredItem(
             title: "Delete Item",
             subtitle: "Move this item to Trash",
             arg: .single(itemId),
             variables: ["action": "delete_item"]
         ))
 
-        AlfredOutput(items: alfredItems).printJSON()
+        let (popped, remaining) = NavStack.pop(from: navStack)
+        if let popped {
+            items.append(AlfredItem(
+                title: "Go Back",
+                arg: nil,
+                icon: AlfredIcon(path: "icons/back.png"),
+                variables: ["next": popped, "nav_stack": remaining]
+            ))
+        }
+
+        return items
     }
 }

@@ -2,8 +2,9 @@ import Foundation
 
 enum ManageAgent {
     static func run() {
+        let env = ProcessInfo.processInfo.environment
         let installed = LaunchAgent.isInstalled
-        let items: [AlfredItem] = [
+        var items: [AlfredItem] = [
             AlfredItem(
                 title: installed ? "Uninstall Auto Sync" : "Install Auto Sync",
                 subtitle: installed
@@ -13,6 +14,15 @@ enum ManageAgent {
                 variables: ["next": installed ? "uninstall_agent" : "install_agent"]
             ),
         ]
+        let (popped, remaining) = NavStack.pop(from: env["nav_stack"] ?? "")
+        if let popped {
+            items.append(AlfredItem(
+                title: "Go Back",
+                arg: nil,
+                icon: AlfredIcon(path: "icons/back.png"),
+                variables: ["next": popped, "nav_stack": remaining]
+            ))
+        }
         AlfredOutput(items: items).printJSON()
     }
 

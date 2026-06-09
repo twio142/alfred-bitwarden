@@ -38,13 +38,10 @@ enum Search {
         let alfredItems = items.map { item -> AlfredItem in
             let matchedBundleId = browserDomain != nil && matchesDomain(item: item, domain: browserDomain!)
                 ? browserBundleId : nil
-            return makeAlfredItem(item: item, recency: recency, browserBundleId: matchedBundleId)
+            return makeAlfredItem(item: item, recency: recency, browserBundleId: matchedBundleId, navStack: env["nav_stack"] ?? "")
         }
 
-        let output = alfredItems.isEmpty
-            ? AlfredOutput(items: [AlfredItem(title: "No items found", subtitle: "Try a different search", valid: false)])
-            : AlfredOutput(items: alfredItems)
-        output.printJSON()
+        AlfredOutput(items: makeOutputItems(alfredItems: alfredItems, navStack: env["nav_stack"] ?? "")).printJSON()
 
         // Background stale-cache check (T062)
         if cache.isStale(interval: syncInterval) {
@@ -59,8 +56,8 @@ enum Search {
         var items = items
         if let orgId = prefs.defaultOrganizationId { items = items.filter { $0.organizationId == orgId } }
         if let colId = prefs.defaultCollectionId { items = items.filter { $0.collectionIds.contains(colId) } }
-        if let folderId = env["folder_id"] {
-            if folderId.isEmpty {
+        if let folderId = env["folder_id"], !folderId.isEmpty {
+            if folderId == "__NULL__" {
                 items = items.filter { $0.folderId == nil }
             } else {
                 items = items.filter { $0.folderId == folderId }
@@ -87,7 +84,23 @@ enum Search {
         }
     }
 
-    static func makeAlfredItem(item: CachedItem, recency: RecencyStore, browserBundleId: String? = nil) -> AlfredItem {
+    static func makeOutputItems(alfredItems: [AlfredItem], navStack: String) -> [AlfredItem] {
+        var output = alfredItems.isEmpty
+            ? [AlfredItem(title: "No items found", subtitle: "Try a different search", valid: false)]
+            : alfredItems
+        let (popped, remaining) = NavStack.pop(from: navStack)
+        if let popped {
+            output.append(AlfredItem(
+                title: "Go Back",
+                arg: nil,
+                icon: AlfredIcon(path: "icons/back.png"),
+                variables: ["next": popped, "nav_stack": remaining]
+            ))
+        }
+        return output
+    }
+
+    static func makeAlfredItem(item: CachedItem, recency: RecencyStore, browserBundleId: String? = nil, navStack: String = "") -> AlfredItem {
         let subtitle = buildSubtitle(item: item)
         let isRecent = recency.isRecent(for: item.id)
         let icon: String
@@ -100,6 +113,7 @@ enum Search {
         }
         let quicklookurl = item.login?.uris?.first?.uri
 
+        let pushed = NavStack.push("search", onto: navStack)
         let shiftMod: AlfredModItem? = item.hasTOTP
             ? AlfredModItem(subtitle: "Copy TOTP code",
                             arg: .multiple([item.id, "totp"]),
@@ -128,10 +142,10 @@ enum Search {
                                    variables: ["action": "get_field"]),
                 alt: AlfredModItem(subtitle: "List fields",
                                    arg: nil,
-                                   variables: ["next": "list_fields", "item_id": item.id]),
+                                   variables: ["next": "list_fields", "item_id": item.id, "nav_stack": pushed]),
                 fn: AlfredModItem(subtitle: "More actions…",
                                   arg: nil,
-                                  variables: ["next": "more", "item_id": item.id])
+                                  variables: ["next": "more", "item_id": item.id, "nav_stack": pushed])
             ),
             variables: defaultVars,
             quicklookurl: quicklookurl
