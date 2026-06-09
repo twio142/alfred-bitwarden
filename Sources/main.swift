@@ -9,6 +9,8 @@ case "search":
     Search.run()
 case "list_folders":
     ListFolders.run()
+case "list_types":
+    ListTypes.run()
 case "list_fields":
     ListFields.run()
 case "list_attachments":

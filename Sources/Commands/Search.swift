@@ -64,6 +64,9 @@ enum Search {
             }
         }
         if env["favorites"] == "true" { items = items.filter { $0.favorite } }
+        if let typeRaw = env["item_type"], let typeInt = Int(typeRaw), let itemType = ItemType(rawValue: typeInt) {
+            items = items.filter { $0.type == itemType }
+        }
         if !query.isEmpty {
             let q = query.lowercased()
             items = items.filter {
@@ -94,7 +97,7 @@ enum Search {
                 title: "Go Back",
                 arg: nil,
                 icon: AlfredIcon(path: "icons/back.png"),
-                variables: ["next": popped, "nav_stack": remaining]
+                variables: ["next": popped, "nav_stack": remaining, "item_type": "", "folder_id": "", "favorites": ""]
             ))
         }
         return output

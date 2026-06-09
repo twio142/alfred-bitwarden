@@ -31,6 +31,14 @@ struct GoBackTests {
         #expect(goBack?.variables?["nav_stack"] == "")
     }
 
+    @Test func searchGoBack_clearsFilterVars() {
+        let items = Search.makeOutputItems(alfredItems: [], navStack: "list_types")
+        let goBack = items.last
+        #expect(goBack?.variables?["item_type"] == "")
+        #expect(goBack?.variables?["folder_id"] == "")
+        #expect(goBack?.variables?["favorites"] == "")
+    }
+
     @Test func searchModifiers_pushStack() {
         let recency = RecencyStore()
         let item = Search.makeAlfredItem(item: makeItem(), recency: recency, navStack: "list_folders")
@@ -83,6 +91,39 @@ struct GoBackTests {
         let items = ListFolders.makeItems(cache: cache, env: [:])
         let folder = items.first { $0.title == "Work" }
         #expect(folder?.variables?["favorites"] == "")
+    }
+
+    // MARK: ListTypes
+
+    @Test func listTypesNoStack_noGoBack() {
+        let items = ListTypes.makeItems(env: [:])
+        #expect(!items.contains { $0.title == "Go Back" })
+    }
+
+    @Test func listTypesWithStack_goBackClearsFilterVars() {
+        let items = ListTypes.makeItems(env: ["nav_stack": "search"])
+        let goBack = items.last
+        #expect(goBack?.title == "Go Back")
+        #expect(goBack?.variables?["next"] == "search")
+        #expect(goBack?.variables?["nav_stack"] == "")
+        #expect(goBack?.variables?["item_type"] == "")
+        #expect(goBack?.variables?["folder_id"] == "")
+        #expect(goBack?.variables?["favorites"] == "")
+    }
+
+    @Test func listTypesPushesStack() {
+        let items = ListTypes.makeItems(env: ["nav_stack": ""])
+        let login = items.first { $0.title == "Logins" }
+        #expect(login?.variables?["nav_stack"] == "list_types")
+        #expect(login?.variables?["item_type"] == "1")
+    }
+
+    @Test func listTypesItems_clearOtherFilterVars() {
+        let items = ListTypes.makeItems(env: [:])
+        let card = items.first { $0.title == "Cards" }
+        #expect(card?.variables?["item_type"] == "3")
+        #expect(card?.variables?["folder_id"] == "")
+        #expect(card?.variables?["favorites"] == "")
     }
 
     // MARK: MoreMenu
