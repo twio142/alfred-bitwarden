@@ -20,8 +20,8 @@ enum ListFolders {
             if let popped {
                 items.append(AlfredItem(
                     title: "Go Back",
-                    subtitle: "Return to previous menu",
                     arg: nil,
+                    icon: AlfredIcon(path: "icons/back.png"),
                     variables: ["next": popped, "nav_stack": remaining, "folder_id": "", "favorites": ""]
                 ))
             }
@@ -31,14 +31,14 @@ enum ListFolders {
         let favoritesItem = AlfredItem(
             title: "Favorites",
             subtitle: "Show favorite items",
-            variables: ["next": "search", "favorites": "true", "nav_stack": pushed]
+            variables: ["next": "search", "favorites": "true", "folder_id": "", "nav_stack": pushed]
         )
         let folderItems = cache.folders.map { folder in
             AlfredItem(
                 title: folder.name,
                 subtitle: "Search in \(folder.name)",
                 icon: AlfredIcon(path: "icons/folder.png"),
-                variables: ["next": "search", "folder_id": folder.id, "nav_stack": pushed]
+                variables: ["next": "search", "folder_id": folder.id, "favorites": "", "nav_stack": pushed]
             )
         }
 

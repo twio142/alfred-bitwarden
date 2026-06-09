@@ -71,6 +71,20 @@ struct GoBackTests {
         #expect(folderItem?.variables?["nav_stack"] == "list_folders")
     }
 
+    @Test func listFoldersFavoritesItem_clearsFolderId() {
+        let cache = makeCache(folders: [CachedFolder(id: "f1", name: "Work")])
+        let items = ListFolders.makeItems(cache: cache, env: [:])
+        let fav = items.first { $0.title == "Favorites" }
+        #expect(fav?.variables?["folder_id"] == "")
+    }
+
+    @Test func listFoldersFolderItem_clearsFavorites() {
+        let cache = makeCache(folders: [CachedFolder(id: "f1", name: "Work")])
+        let items = ListFolders.makeItems(cache: cache, env: [:])
+        let folder = items.first { $0.title == "Work" }
+        #expect(folder?.variables?["favorites"] == "")
+    }
+
     // MARK: MoreMenu
 
     @Test func moreMenuNoStack_noGoBack() {
