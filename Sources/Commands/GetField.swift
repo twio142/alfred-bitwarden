@@ -32,6 +32,7 @@ enum GetField {
             case "username": value = try fetchUsername(itemId)
             case "notes": value = try fetchNotes(itemId)
             case "card_number": value = try fetchCardNumber(itemId)
+            case "card_cvv": value = try fetchCardCVV(itemId)
             default:
                 throw NSError(domain: "bw-alfred", code: 7, userInfo: [NSLocalizedDescriptionKey: "Unknown field: \(field)"])
             }
@@ -103,6 +104,14 @@ enum GetField {
             throw NSError(domain: "bw-alfred", code: 9, userInfo: [NSLocalizedDescriptionKey: "No card number found"])
         }
         return number
+    }
+
+    private static func fetchCardCVV(_ itemId: String) throws -> String {
+        let liveItem = try BWItems.getItem(itemId)
+        guard let code = liveItem.card?.code else {
+            throw NSError(domain: "bw-alfred", code: 10, userInfo: [NSLocalizedDescriptionKey: "No CVV found"])
+        }
+        return code
     }
 
     private static func fetchURL(_ itemId: String, index: Int) throws -> String {

@@ -127,8 +127,24 @@ enum Search {
             switch item.type {
             case .login: return (.multiple([item.id, "password"]), ["action": "get_field"])
             case .secureNote: return (.multiple([item.id, "notes"]), ["action": "get_field"])
-            case .card: return (.multiple([item.id, "card_number"]), ["action": "get_field"])
+            case .card: return (.multiple([item.id, "card_cvv"]), ["action": "get_field"])
             case .identity: return (.single(item.id), ["action": "show_item"])
+            }
+        }()
+
+        let cmdMod: AlfredModItem? = {
+            switch item.type {
+            case .login:
+                return AlfredModItem(subtitle: "Copy username",
+                                     arg: .multiple([item.id, "username"]),
+                                     valid: item.login?.username != nil,
+                                     variables: ["action": "get_field"])
+            case .card:
+                return AlfredModItem(subtitle: "Copy card number",
+                                     arg: .multiple([item.id, "card_number"]),
+                                     variables: ["action": "get_field"])
+            default:
+                return nil
             }
         }()
 
@@ -139,10 +155,7 @@ enum Search {
             icon: icon,
             mods: AlfredMods(
                 shift: shiftMod,
-                cmd: AlfredModItem(subtitle: "Copy username",
-                                   arg: .multiple([item.id, "username"]),
-                                   valid: item.login?.username != nil,
-                                   variables: ["action": "get_field"]),
+                cmd: cmdMod,
                 alt: AlfredModItem(subtitle: "List fields",
                                    arg: nil,
                                    variables: ["next": "list_fields", "item_id": item.id, "nav_stack": pushed]),
