@@ -7,7 +7,7 @@ enum Search {
         let syncInterval = Int(env["SyncTime"] ?? "60") ?? 60
 
         guard let cache = VaultCache.load() else {
-            AlfredOutput.loading("Vault cache empty — syncing…").printJSON()
+            AlfredOutput.loading("Vault Cache Empty — Syncing…").printJSON()
             return
         }
 
