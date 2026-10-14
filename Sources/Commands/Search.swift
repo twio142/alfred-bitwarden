@@ -6,9 +6,17 @@ enum Search {
         let env = ProcessInfo.processInfo.environment
         let syncInterval = Int(env["SyncTime"] ?? "60") ?? 60
 
-        guard let cache = VaultCache.load() else {
-            AlfredOutput.loading("Vault Cache Empty — Syncing…").printJSON()
-            return
+        let cache: VaultCache
+        if let loaded = VaultCache.load() {
+            cache = loaded
+        } else {
+            do {
+                try ensureUnlocked()
+                cache = try BWSync.sync()
+            } catch {
+                AlfredOutput.error("Sync failed: \(error)").printJSON()
+                return
+            }
         }
 
         let prefs = WorkflowPrefs.load()
@@ -25,13 +33,19 @@ enum Search {
         items.sort { a, b in
             let aUrlMatch = browserDomain != nil && matchesDomain(item: a, domain: browserDomain!)
             let bUrlMatch = browserDomain != nil && matchesDomain(item: b, domain: browserDomain!)
-            if aUrlMatch != bUrlMatch { return aUrlMatch }
+            if aUrlMatch != bUrlMatch {
+                return aUrlMatch
+            }
 
             let aRecent = recency.isRecent(for: a.id)
             let bRecent = recency.isRecent(for: b.id)
-            if aRecent != bRecent { return aRecent }
+            if aRecent != bRecent {
+                return aRecent
+            }
 
-            if a.favorite != b.favorite { return a.favorite }
+            if a.favorite != b.favorite {
+                return a.favorite
+            }
             return a.name.lowercased() < b.name.lowercased()
         }
 
@@ -54,8 +68,12 @@ enum Search {
 
     private static func applyFilters(to items: [CachedItem], prefs: WorkflowPrefs, env: [String: String], query: String) -> [CachedItem] {
         var items = items
-        if let orgId = prefs.defaultOrganizationId { items = items.filter { $0.organizationId == orgId } }
-        if let colId = prefs.defaultCollectionId { items = items.filter { $0.collectionIds.contains(colId) } }
+        if let orgId = prefs.defaultOrganizationId {
+            items = items.filter { $0.organizationId == orgId }
+        }
+        if let colId = prefs.defaultCollectionId {
+            items = items.filter { $0.collectionIds.contains(colId) }
+        }
         if let folderId = env["folder_id"], !folderId.isEmpty {
             if folderId == "__NULL__" {
                 items = items.filter { $0.folderId == nil }
@@ -63,7 +81,9 @@ enum Search {
                 items = items.filter { $0.folderId == folderId }
             }
         }
-        if env["favorites"] == "true" { items = items.filter { $0.favorite } }
+        if env["favorites"] == "true" {
+            items = items.filter { $0.favorite }
+        }
         if let typeRaw = env["item_type"], let typeInt = Int(typeRaw), let itemType = ItemType(rawValue: typeInt) {
             items = items.filter { $0.type == itemType }
         }
@@ -172,9 +192,14 @@ enum Search {
         switch item.type {
         case .login:
             var parts: [String] = []
-            if let user = item.login?.username, !user.isEmpty { parts.append(user) }
+            if let user = item.login?.username, !user.isEmpty {
+                parts.append(user)
+            }
             if let uri = item.login?.uris?.first?.uri,
-               let domain = URLMatcher.etld1(from: uri) { parts.append(domain) }
+               let domain = URLMatcher.etld1(from: uri)
+            {
+                parts.append(domain)
+            }
             return parts.joined(separator: " · ")
         case .card:
             let brand = item.card?.brand ?? "Card"
