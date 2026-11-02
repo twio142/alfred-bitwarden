@@ -54,7 +54,14 @@ enum BWServer {
         try? FileManager.default.removeItem(atPath: pidFile)
     }
 
+    /// True if the process exists and is not a zombie (`kill(pid, 0)` alone succeeds for zombies).
     private static func isProcessRunning(_ pid: pid_t) -> Bool {
-        kill(pid, 0) == 0
+        var info = kinfo_proc()
+        var size = MemoryLayout<kinfo_proc>.stride
+        var mib: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, pid]
+        guard sysctl(&mib, UInt32(mib.count), &info, &size, nil, 0) == 0,
+              size > 0
+        else { return false }
+        return Int32(info.kp_proc.p_stat) != SZOMB
     }
 }
