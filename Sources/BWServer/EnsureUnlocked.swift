@@ -5,11 +5,15 @@ enum EnsureUnlockedError: Error {
     case authenticationFailed(String)
 }
 
-func ensureUnlocked() throws {
+func ensureServer() throws {
     if !BWServer.isRunning() {
         BWServer.start()
         try waitForServer(timeout: 3)
     }
+}
+
+func ensureUnlocked() throws {
+    try ensureServer()
 
     let state = try BWStatus.get()
 

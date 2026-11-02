@@ -6,6 +6,8 @@ enum Unlock {
         let email = env["bwuser"] ?? ""
 
         do {
+            try ensureServer()
+
             // Try Keychain first
             if let password = try? Keychain.load(for: email), !password.isEmpty {
                 _ = try BWAuth.restUnlock(password: password)
