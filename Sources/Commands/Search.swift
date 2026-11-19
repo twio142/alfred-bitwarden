@@ -218,7 +218,7 @@ enum Search {
         case .login: return "icons/login.png"
         case .secureNote: return "icons/secret-note.png"
         case .card:
-            if let brand = item.card?.brand, !brand.isEmpty {
+            if let brand = item.card?.brand, !brand.isEmpty, brand != "Other" {
                 return "icons/\(brand).png"
             }
             return "icons/card.png"
