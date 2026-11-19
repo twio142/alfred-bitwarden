@@ -9,7 +9,6 @@ Packages/
 .vscode/
 .idea/
 prefs.plist
-icons/
 /.claude/skills
 /.specify/extensions
 /.specify/integrations

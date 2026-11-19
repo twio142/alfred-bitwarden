@@ -39,5 +39,19 @@ Results are ranked automatically:
 
 Lightweight agent keeps vault fresh. Configure interval in Workflow Settings.
 
+## Credits
+
+Originally based on [Bitwarden Accelerator](https://github.com/ajrosen/Bitwarden-Accelerator) by Andy Rosen.
+
+Icons by [Laura Reen](https://www.magnific.com/author/laura-reen/icons) from [Magnific](https://www.magnific.com). The files in `icons/` are not covered by this project's license.
+
+## License
+
+Copyright (C) 2024 Andy Rosen
+
+Copyright (C) 2024–2026 twio142
+
+Licensed under the [GNU GPL v3](LICENSE).
+
 ---
 *Firefox requires [Alfred Integration](https://addons.mozilla.org/en-US/firefox/addon/alfred-launcher-integration) extension.*
